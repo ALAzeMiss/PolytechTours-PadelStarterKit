@@ -8,12 +8,12 @@
       <div class="bg-white rounded-lg shadow-2xl p-8">
        
         <div>
-        <button
+        <button @click="handleClick"
         type="submit"
         
         class="w-full py-3 bg-blue-600 text-white rounded-lg font-semibold hover:bg-blue-700 transition-colors disabled:bg-gray-400 disabled:cursor-not-allowed"
-        >
-          <span>Nouveau joueur</span>
+      >
+        Nouveau joueur
         </button>
         </div>
        
@@ -29,6 +29,7 @@ const router = useRouter()
 const handleClick = () => {
     router.push('/user/create')
   };
+
 
 </script>
 
