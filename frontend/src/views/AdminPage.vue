@@ -19,9 +19,9 @@
 <script>
  
 const handleClick = () => {
-//    <router-link
-//         to="/user/create">
-//     </router-link>
+    <router-link
+         to="/user/create">
+     </router-link>
   };
  
 </script>

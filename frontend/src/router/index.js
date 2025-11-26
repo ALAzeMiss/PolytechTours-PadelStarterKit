@@ -7,6 +7,8 @@ import { useAuthStore } from '../stores/auth'
 import HomePage from '../views/HomePage.vue'
 import LoginPage from '../views/LoginPage.vue'
 import AdminPage from '../views/AdminPage.vue'
+import UserCreatePage from '../views/UserCreatePage.vue'
+
 const routes = [
   {
     path: '/',
@@ -18,6 +20,12 @@ const routes = [
     path: '/login',
     name: 'login',
     component: LoginPage,
+    meta: { requiresAuth: false }
+  },
+  {
+    path: '/user/create',
+    name: 'user_create',
+    component: UserCreatePage,
     meta: { requiresAuth: false }
   },
   // TODO: Ajouter les autres routes (Planning, Matchs, Résultats, Admin, Profil)
