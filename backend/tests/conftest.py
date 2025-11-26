@@ -55,7 +55,7 @@ def test_user(db_session):
     user = User(
         email="test@example.com",
         password_hash=get_password_hash("ValidP@ssw0rd123"),
-        role="JOUEUR",
+        is_admin="JOUEUR",
         is_active=True
     )
     db_session.add(user)
@@ -69,7 +69,7 @@ def test_admin(db_session):
     admin = User(
         email="admin@example.com",
         password_hash=get_password_hash("AdminP@ssw0rd123"),
-        role="ADMINISTRATEUR",
+        is_admin="ADMINISTRATEUR",
         is_active=True
     )
     db_session.add(admin)

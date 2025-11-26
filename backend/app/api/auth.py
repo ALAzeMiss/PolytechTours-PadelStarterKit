@@ -96,7 +96,7 @@ def login(credentials: LoginRequest, db: Session = Depends(get_db)):
         data={
             "sub": str(user.id),
             "email": user.email,
-            "role": user.role
+            "role": user.is_admin
         }
     )
     
