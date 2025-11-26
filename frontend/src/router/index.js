@@ -28,13 +28,13 @@ const routes = [
     component: UserCreatePage,
     meta: { requiresAuth: false }
   },
-  // TODO: Ajouter les autres routes (Planning, Matchs, Résultats, Admin, Profil)
   {
     path: '/admin',
     name: 'admin',
     component: AdminPage,
     meta: { requiresAuth: true }
   }
+  // TODO: Ajouter les autres routes (Planning, Matchs, Résultats, Admin, Profil)
 ]
 
 const router = createRouter({

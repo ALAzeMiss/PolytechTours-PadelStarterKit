@@ -8,7 +8,13 @@
       <div class="bg-white rounded-lg shadow-2xl p-8">
        
         <div>
-        <button @click="handleClick">Nouveau joueur</button>
+        <button
+        type="submit"
+        
+        class="w-full py-3 bg-blue-600 text-white rounded-lg font-semibold hover:bg-blue-700 transition-colors disabled:bg-gray-400 disabled:cursor-not-allowed"
+        >
+          <span>Nouveau joueur</span>
+        </button>
         </div>
        
       </div>
@@ -16,14 +22,14 @@
   </div>
 </template>
 
-<script>
- 
+<script setup>
+import { useRouter } from 'vue-router'
+const router = useRouter()
+
 const handleClick = () => {
-    <router-link
-         to="/user/create">
-     </router-link>
+    router.push('/user/create')
   };
- 
+
 </script>
 
  
