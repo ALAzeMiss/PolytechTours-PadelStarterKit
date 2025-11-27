@@ -13,8 +13,8 @@ import EquipPage from '../views/EquipPage.vue'
 import EquipCreatePage from '../views/EquipCreatePage.vue'
 import PoulePage from '../views/PoulePage.vue'
 import PouleCreatePage from '../views/PouleCreatePage.vue'
-import JoueurPage from '../views/JoueurPage.vue'
-import JoueurCreatePage from '../views/JoueurCreatePage.vue'
+import PlayerPage from '../views/PlayerPage.vue'
+import PlayerCreatePage from '../views/PlayerCreatePage.vue'
 
 const routes = [
   {
@@ -72,15 +72,15 @@ const routes = [
     meta: { requiresAuth: false }
   },
   {
-    path: '/joueur',
-    name: 'joueur',
-    component: JoueurPage,
+    path: '/player',
+    name: 'player',
+    component: PlayerPage,
     meta: { requiresAuth: false }
   },
   {
-    path: '/joueur/create',
-    name: 'joueur_create',
-    component: JoueurCreatePage,
+    path: '/player/create',
+    name: 'player_create',
+    component: PlayerCreatePage,
     meta: { requiresAuth: false }
   }
   // TODO: Ajouter les autres routes (Planning, Matchs, Résultats, Admin, Profil)
