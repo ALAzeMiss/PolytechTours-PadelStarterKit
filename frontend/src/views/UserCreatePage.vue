@@ -1,7 +1,9 @@
 <template>
-  <div class="min-h-screen flex items-center justify-center bg-gradient-to-br from-blue-50 to-indigo-100">
-    <div class="max-w-4xl mx-auto p-8 text-center">
-
+  <div class="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100">
+    <!-- Barre de nav -->
+    <NavAdminBar/>
+    
+    <div class="max-w-4xl mx-auto p-20 text-center">
       <!-- Image ou logo -->
       <div class="mb-20">
         <div class="w-48 h-48 mx-auto bg-blue-600 rounded-full flex items-center justify-center text-white text-8xl shadow-2xl">
@@ -45,7 +47,7 @@
         
         class="w-full py-3 bg-blue-600 text-white rounded-lg font-semibold hover:bg-blue-700 transition-colors disabled:bg-gray-400 disabled:cursor-not-allowed"
       >
-        <span>Se connecter</span>
+        <span>Ajouter un profil</span>
       </button>
 
     </div>
@@ -54,6 +56,7 @@
 
 <script setup>
 import { useAuthStore } from '../stores/auth'
+import NavAdminBar from '@/components/NavAdminBar.vue'
 
 const authStore = useAuthStore()
 </script>
