@@ -27,7 +27,7 @@ python -c "from app.database import init_db; init_db()"
 ## Lancement
 
 ```bash
-uvicorn app.main:app --reload --port 8000
+python -m uvicorn app.main:app --reload --port 8000
 ```
 
 API : http://localhost:8000
