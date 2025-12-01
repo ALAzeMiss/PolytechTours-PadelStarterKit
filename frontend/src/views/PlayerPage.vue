@@ -69,8 +69,8 @@ import { ref } from 'vue'
 const router = useRouter()
 
 const users = ref([
-  { id: 1, name: 'Alice', entreprise: 'Entreprise A', licenceNumber: '12345', email: 'alice@example.com', isAdmin: true },
-  { id: 2, name: 'Bob', entreprise: 'Entreprise B', licenceNumber: '67890', email: 'bob@example.com', isAdmin: false }
+  { id: 1, name: 'Alice', entreprise: 'Entreprise A', licenceNumber: '12345', email: 'alice@example.com' },
+  { id: 2, name: 'Bob', entreprise: 'Entreprise B', licenceNumber: '67890', email: 'bob@example.com' }
 ])
 
 const handlePlayer = () => router.push('/player/create')
