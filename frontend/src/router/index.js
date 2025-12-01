@@ -8,6 +8,7 @@ import HomePage from '../views/HomePage.vue'
 import LoginPage from '../views/LoginPage.vue'
 import AdminPage from '../views/AdminPage.vue'
 import UserCreatePage from '../views/UserCreatePage.vue'
+import PlanningPage from '../views/PlanningPage.vue'
 
 const routes = [
   {
@@ -27,6 +28,12 @@ const routes = [
     name: 'user_create',
     component: UserCreatePage,
     meta: { requiresAuth: false }
+  },
+  {
+    path: '/planning',
+    name: 'planning',
+    component: PlanningPage,
+    meta: { requiresAuth: true }
   },
   {
     path: '/admin',
