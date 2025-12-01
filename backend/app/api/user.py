@@ -29,11 +29,10 @@ def generate_password(length: int = 12) -> str:
         any(c in "!@#$%^&*" for c in password)):
         return password
     else:
-      
         return generate_password(length)
 
-@router.post("/user/create", response_model=CreateUserResponse)
-def create_user(user_data: CreateUserRequest, db: Session = Depends(get_db),current_admin: User = Depends(get_current_admin) ):
+@router.post("/users", response_model=CreateUserResponse)
+def createUser(user_data: CreateUserRequest, db: Session = Depends(get_db),current_admin: User = Depends(get_current_admin) ):
     # Vérifier si l'email existe déjà
     existing_user = db.query(User).filter(User.email == user_data.email).first()
     if existing_user:

@@ -34,7 +34,7 @@ async def add_security_headers(request, call_next):
 
 # Routes
 app.include_router(auth.router, prefix="/api/v1/auth", tags=["Authentication"])
-app.include_router(user.router, prefix="/api/v1/user", tags=["Creation Users"])
+app.include_router(user.router, prefix="/api/v1/users", tags=["Creation Users"])
 
 
 @app.get("/")

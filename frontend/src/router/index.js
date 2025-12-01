@@ -45,7 +45,7 @@ const routes = [
     meta: { requiresAuth: true }
   },
   {
-    path: '/user/create',
+    path: '/users',
     name: 'user_create',
     component: UserCreatePage,
     meta: { requiresAuth: true }

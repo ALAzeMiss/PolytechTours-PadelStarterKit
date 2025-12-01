@@ -26,9 +26,9 @@
     </RouterLink>
 
     <RouterLink 
-      to="/user/create"
+      to="/users"
       class="text-lg font-semibold hover:text-blue-600"
-      :class="{ 'text-blue-600 underline' : isActive('/user/create') }"
+      :class="{ 'text-blue-600 underline' : isActive('/users/create') }"
     >
       Comptes
     </RouterLink>
