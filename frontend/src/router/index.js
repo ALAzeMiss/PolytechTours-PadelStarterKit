@@ -18,6 +18,9 @@ import PouleEditPage from '../views/PouleEditPage.vue'
 import PlayerPage from '../views/PlayerPage.vue'
 import PlayerCreatePage from '../views/PlayerCreatePage.vue'
 import PlayerEditPage from '../views/PlayerEditPage.vue'
+import MatchPage from '../views/MatchPage.vue'
+import MatchCreatePage from '../views/MatchCreatePage.vue'
+import MatchEditPage from '../views/MatchEditPage.vue'
 
 const routes = [
   {
@@ -106,8 +109,27 @@ const routes = [
     component: PlayerEditPage,
     meta: { requiresAuth: true },
     props: true
+  },
+  {
+    path: '/matches',
+    name: 'matches',
+    component: MatchPage,
+    meta: { requiresAuth: true }
+  },
+  {
+    path: '/matches/create',
+    name: 'match_create',
+    component: MatchCreatePage,
+    meta: { requiresAuth: true }
+  },
+  {
+    path: '/matches/edit/:id',
+    name: 'edit-match',
+    component: MatchEditPage,
+    meta: { requiresAuth: true },
+    props: true
   }
-  // TODO: Ajouter les autres routes (Planning, Matchs, Résultats, Admin, Profil)
+  // TODO: Ajouter les autres routes (Planning, Résultats, Admin, Profil)
 ]
 
 const router = createRouter({

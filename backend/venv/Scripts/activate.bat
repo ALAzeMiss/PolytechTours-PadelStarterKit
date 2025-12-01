@@ -8,7 +8,7 @@ if defined _OLD_CODEPAGE (
     "%SystemRoot%\System32\chcp.com" 65001 > nul
 )
 
-set VIRTUAL_ENV=D:\DEV\padel-starterkit\corpo-padel-starter-kit\backend\venv
+set VIRTUAL_ENV=C:\Users\morge\Desktop\2025-2026\5A\Test_secu_log\PolytechTours-PadelStarterKit\backend\venv
 
 if not defined PROMPT set PROMPT=$P$G
 

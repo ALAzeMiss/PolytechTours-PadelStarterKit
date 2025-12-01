@@ -1,7 +1,8 @@
-from fastapi import FastAPI
+from fastapi import FastAPI, Request, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
+from fastapi.responses import JSONResponse
 from app.core.config import settings
-from app.api import auth, user
+from app.api import auth, user, match
 from app.database import engine
 from app.models import models
 
@@ -17,7 +18,7 @@ app = FastAPI(
 # Configuration CORS
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=settings.allowed_origins,  # ← Changé de ALLOWED_ORIGINS
+    allow_origins=settings.allowed_origins,
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
@@ -32,9 +33,32 @@ async def add_security_headers(request, call_next):
     response.headers["X-XSS-Protection"] = "1; mode=block"
     return response
 
+# Gestionnaire d'erreurs personnalisé pour traduire les messages en français
+@app.exception_handler(HTTPException)
+async def http_exception_handler(request: Request, exc: HTTPException):
+    # Traduire les messages d'erreur courants en français
+    french_messages = {
+        404: "Ressource introuvable",
+        403: "Accès refusé",
+        401: "Non autorisé",
+        400: "Requête invalide",
+        500: "Erreur interne du serveur"
+    }
+    
+    # Utiliser le message de l'exception s'il existe, sinon utiliser le message traduit
+    detail = exc.detail
+    if exc.detail == "Not Found":
+        detail = french_messages.get(exc.status_code, exc.detail)
+    
+    return JSONResponse(
+        status_code=exc.status_code,
+        content={"detail": detail}
+    )
+
 # Routes
 app.include_router(auth.router, prefix="/api/v1/auth", tags=["Authentication"])
 app.include_router(user.router, prefix="/api/v1/users", tags=["Creation Users"])
+app.include_router(match.router, prefix="/api/v1/matches", tags=["Creation Matches"])
 
 
 @app.get("/")

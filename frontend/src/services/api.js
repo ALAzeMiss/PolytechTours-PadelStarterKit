@@ -41,12 +41,12 @@ api.interceptors.response.use(
 
 // API d'authentification
 export const authAPI = {
-  login: (email, password) => 
+  login: (email, password) =>
     api.post('/auth/login', { email, password }),
-  
-  logout: () => 
+
+  logout: () =>
     api.post('/auth/logout'),
-  
+
   changePassword: (currentPassword, newPassword, confirmPassword) =>
     api.post('/auth/change-password', {
       current_password: currentPassword,
@@ -70,7 +70,23 @@ export const userAPI = {
 
   regeneratePassword: () =>
     api.get('/users/generate-password')
+}
 
+export const matchAPI = {
+  getMatches: (params) =>
+    api.get('/matches', { params }),
+
+  getMatch: (matchId) =>
+    api.get(`/matches/${matchId}`),
+
+  createMatch: (matchData) =>
+    api.post('/matches', matchData),
+
+  updateMatch: (matchId, matchData) =>
+    api.patch(`/matches/${matchId}`, matchData),
+
+  deleteMatch: (matchId) =>
+    api.delete(`/matches/${matchId}`)
 }
 
 export default api

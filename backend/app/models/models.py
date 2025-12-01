@@ -6,6 +6,7 @@ from sqlalchemy import Boolean, Column, Integer, String, DateTime, ForeignKey, D
 from sqlalchemy.sql import func
 from app.database import Base
 from sqlalchemy.orm import relationship
+import enum
 
 class User(Base):
     __tablename__ = "users"
@@ -80,7 +81,7 @@ class Event(Base):
     matches = relationship("Match", back_populates="event")
 
 
-class MatchStatus(Base):
+class MatchStatus(str, enum.Enum):
     A_VENIR = "A_VENIR"
     ANNULE = "ANNULE"
     TERMINE = "TERMINE"
@@ -92,7 +93,9 @@ class Match(Base):
     id = Column(Integer, primary_key=True, index=True)
     team1_id = Column(Integer, ForeignKey("teams.id"), nullable=False)
     team2_id = Column(Integer, ForeignKey("teams.id"), nullable=False)
-    event_id = Column(Integer, ForeignKey("events.id"), nullable=False)
+    match_date = Column(Date, nullable=False)
+    match_time = Column(Time, nullable=False)
+    event_id = Column(Integer, ForeignKey("events.id"), nullable=True)
     court_number = Column(Integer, nullable=False)
     status = Column(String, default=MatchStatus.A_VENIR, nullable=False)
     score_team1 = Column(Integer, nullable=True)
