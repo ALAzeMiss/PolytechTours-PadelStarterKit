@@ -57,19 +57,19 @@ export const authAPI = {
 
 export const userAPI = {
   createUser: (userData) =>
-    api.post('/users', userData),
+    api.post('/users/users', userData),
 
   getUser: (userId) =>
-    api.get(`/users/${userId}`),
+    api.get(`/users/users${userId}`),
 
   updateUser: (userId, userData) =>
-    api.put(`/users/${userId}`, userData),
+    api.put(`/users/users${userId}`, userData),
 
   deleteUser: (userId) =>
-    api.delete(`/users/${userId}`),
+    api.delete(`/users/users${userId}`),
 
   regeneratePassword: () =>
-    api.get('/users/generate-password')
+    api.get('/users/users/generate-password')
 }
 
 export const matchAPI = {
