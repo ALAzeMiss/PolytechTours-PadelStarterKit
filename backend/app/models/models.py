@@ -48,8 +48,8 @@ class Player(Base):
 class Pool(Base):
     __tablename__ = "pools"
     
-    id = Column(Integer, primary_key=True, index=True)
-    name = Column(String, nullable=False)
+    id = Column(String, primary_key=True, index=True)  # Changed from Integer to String
+    # name removed as ID (A, B, C) serves as the name
     created_at = Column(DateTime(timezone=True), server_default=func.now())
     teams = relationship("Team", back_populates="pools")
 
@@ -62,7 +62,7 @@ class Team(Base):
     player1_id = Column(Integer, ForeignKey("player.id"), nullable=False)
     player2_id = Column(Integer, ForeignKey("player.id"), nullable=False)
 
-    pool_id = Column(Integer, ForeignKey("pools.id"), nullable=True)
+    pool_id = Column(String, ForeignKey("pools.id"), nullable=True)  # Changed from Integer to String
 
     player1 = relationship("Player", foreign_keys=[player1_id])
     player2 = relationship("Player", foreign_keys=[player2_id])

@@ -2,7 +2,7 @@ from fastapi import FastAPI, Request, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse
 from app.core.config import settings
-from app.api import auth, user, match
+from app.api import auth, user, match, pool
 from app.database import engine
 from app.models import models
 
@@ -59,6 +59,7 @@ async def http_exception_handler(request: Request, exc: HTTPException):
 app.include_router(auth.router, prefix="/api/v1/auth", tags=["Authentication"])
 app.include_router(user.router, prefix="/api/v1/users", tags=["Creation Users"])
 app.include_router(match.router, prefix="/api/v1/matches", tags=["Creation Matches"])
+app.include_router(pool.router, prefix="/api/v1/pools", tags=["Creation Pools"])
 
 
 @app.get("/")

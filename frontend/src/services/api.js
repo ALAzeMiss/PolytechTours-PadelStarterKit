@@ -89,4 +89,12 @@ export const matchAPI = {
     api.delete(`/matches/${matchId}`)
 }
 
+export const poolAPI = {
+  getPools: () =>
+    api.get('/pools'),
+
+  createPool: (poolData) =>
+    api.post('/pools', poolData)
+}
+
 export default api

@@ -15,13 +15,13 @@ from app.schemas.player import PlayerInfo
 from app.api.deps import get_current_user, get_current_admin
 from app.models.models import User
 
-router = APIRouter(prefix="/matches", tags=["matches"])
+router = APIRouter(tags=["matches"])
 
 @router.get("/", response_model=List[MatchDetailResponse])
 def read_upcoming_matches(
     show_all: bool = Query(False, description="Afficher tous les matchs (pour les joueurs)"),
     company: Optional[str] = Query(None, description="Filtrer par entreprise"),
-    pool_id: Optional[int] = Query(None, description="Filtrer par poule"),
+    pool_id: Optional[str] = Query(None, description="Filtrer par poule"),
     status: Optional[str] = Query(None, description="Filtrer par statut"),
     db: Session = Depends(get_db),
     current_user: User = Depends(get_current_user)

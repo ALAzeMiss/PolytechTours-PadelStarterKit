@@ -50,7 +50,7 @@
           <div>
             <label class="block text-sm font-medium text-gray-700 mb-1">Poule</label>
             <input 
-              type="number" 
+              type="text" 
               v-model="filters.pool_id"
               @input="fetchMatches"
               placeholder="ID de la poule"

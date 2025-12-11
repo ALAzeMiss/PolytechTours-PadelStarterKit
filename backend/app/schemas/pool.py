@@ -6,13 +6,12 @@ from pydantic import BaseModel
 from datetime import datetime
 
 class PoolBase(BaseModel):
-    name: str
+    id: str
 
 class PoolCreate(PoolBase):
     pass
 
 class PoolResponse(PoolBase):
-    id: int
     created_at: datetime
 
     class Config:

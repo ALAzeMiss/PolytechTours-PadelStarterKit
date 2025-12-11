@@ -10,36 +10,45 @@
       <!-- Contenu principal -->
       <form class="space-y-4">
         <div>
+          <label class="block mb-1 font-medium">ID Poule</label>
+          <input v-model="poolId" type="text" class="w-full p-2 rounded border" placeholder="ex: A, B, C" />
+        </div>
+
+        <div v-if="errorMsg" class="text-red-500 text-sm font-bold">
+          {{ errorMsg }}
+        </div>
+
+        <div>
           <label class="block mb-1 font-medium">Équipe 1</label>
-          <input v-model="nom" type="text" class="w-full p-2 rounded border" placeholder="Nom de l'équipe 1" />
+          <input v-model="equipe1" type="text" class="w-full p-2 rounded border" placeholder="Nom de l'équipe 1" />
         </div>
 
 
         <div>
           <label class="block mb-1 font-medium">Équipe 2</label>
-          <input v-model="joueur1" type="text" class="w-full p-2 rounded border" placeholder="Nom de l'équipe 2" />
+          <input v-model="equipe2" type="text" class="w-full p-2 rounded border" placeholder="Nom de l'équipe 2" />
         </div>
 
 
         <div>
           <label class="block mb-1 font-medium">Équipe 3</label>
-          <input v-model="joueur2" type="text" class="w-full p-2 rounded border" placeholder="Nom de l'équipe 3" />
+          <input v-model="equipe3" type="text" class="w-full p-2 rounded border" placeholder="Nom de l'équipe 3" />
         </div>
 
 
         <div>
           <label class="block mb-1 font-medium">Équipe 4</label>
-          <input v-model="poule" type="text" class="w-full p-2 rounded border" placeholder="Nom de l'équipe 4" />
+          <input v-model="equipe4" type="text" class="w-full p-2 rounded border" placeholder="Nom de l'équipe 4" />
         </div>
 
         <div>
           <label class="block mb-1 font-medium">Équipe 5</label>
-          <input v-model="poule" type="text" class="w-full p-2 rounded border" placeholder="Nom de l'équipe 5" />
+          <input v-model="equipe5" type="text" class="w-full p-2 rounded border" placeholder="Nom de l'équipe 5" />
         </div>
 
         <div>
           <label class="block mb-1 font-medium">Équipe 6</label>
-          <input v-model="poule" type="text" class="w-full p-2 rounded border" placeholder="Nom de l'équipe 6" />
+          <input v-model="equipe6" type="text" class="w-full p-2 rounded border" placeholder="Nom de l'équipe 6" />
         </div>
 
         <div class="flex justify-center">
@@ -58,10 +67,11 @@
 <script setup>
 import NavAdminBar from '@/components/NavAdminBar.vue'
 import { useRouter } from 'vue-router'
-
-// Définir les données avec ref
 import { ref } from 'vue'
+import { poolAPI } from '@/services/api' // Import custom poolAPI
 
+const poolId = ref('')
+// Adding separate refs for teams to fix the bug, though not using them for DB creation yet
 const equipe1 = ref('')
 const equipe2 = ref('')
 const equipe3 = ref('')
@@ -69,12 +79,27 @@ const equipe4 = ref('')
 const equipe5 = ref('')
 const equipe6 = ref('')
 
-// Utiliser le router
+const errorMsg = ref('')
+
 const router = useRouter()
 
-// Exemple de fonction de validation
-function handleValider() {
-  console.log('Formulaire :', equipe1.value, equipe2.value, equipe3.value, equipe4.value, equipe5.value, equipe6.value)
-  router.push('/poule')
+async function handleValider() {
+  errorMsg.value = ''
+  if (!poolId.value) {
+    errorMsg.value = "L'identifiant de la poule est requis."
+    return
+  }
+
+  try {
+    await poolAPI.createPool({ id: poolId.value })
+    // TODO: Handle teams creation. Currently Team model requires linked Players.
+    // We would need to search/select players or create dummy ones.
+    // For now, only the Pool is created.
+    console.log('Poule created:', poolId.value)
+    router.push('/poule')
+  } catch (err) {
+    console.error("Erreur lors de la création de la poule", err)
+    errorMsg.value = "Erreur lors de la création : " + (err.response?.data?.detail || err.message)
+  }
 }
 </script>

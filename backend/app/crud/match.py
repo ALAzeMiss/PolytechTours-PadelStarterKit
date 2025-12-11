@@ -43,7 +43,7 @@ def get_upcoming_matches(
     user: User = None,
     show_all: bool = False,
     company_filter: str = None,
-    pool_filter: int = None,
+    pool_filter: str = None,
     status_filter: str = None
 ):
     """
