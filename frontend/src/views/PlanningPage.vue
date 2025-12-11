@@ -14,7 +14,24 @@
               <div class="font-medium">{{ monthYearLabel }}</div>
               <button @click="nextMonth" class="px-3 py-1 bg-gray-100 rounded">&gt;</button>
             </div>
-            <div class="text-sm text-gray-600">● = Événements planifiés</div>
+            <div class="flex items-center gap-4">
+              <div class="text-sm text-gray-600">● = Événements planifiés</div>
+              <!-- Toggle visible only for non-admin users -->
+              <div v-if="!authStore.isAdmin" class="text-sm">
+                <button
+                  :class="viewMode === 'my' ? 'px-3 py-1 bg-blue-600 text-white rounded' : 'px-3 py-1 bg-gray-100 rounded'"
+                  @click="setViewMode('my')">
+                  Mes matchs
+                </button>
+                <button
+                  :class="viewMode === 'all' ? 'px-3 py-1 bg-blue-600 text-white rounded' : 'px-3 py-1 bg-gray-100 rounded'"
+                  @click="setViewMode('all')">
+                  Tous
+                </button>
+              </div>
+              <!-- For admins, show badge indicating 'Tous' -->
+              <div v-else class="text-sm text-gray-600">Affichage: Tous</div>
+            </div>
           </div>
 
           <div class="mt-6 grid grid-cols-7 gap-2 text-center">
@@ -65,8 +82,9 @@
 
 <script setup>
 // importations
-import { ref, computed } from 'vue'
+import { ref, computed, onMounted, watch } from 'vue'
 import { useAuthStore } from '../stores/auth'
+import api from '../services/api'
 
 // accès au token de connexion
 const authStore = useAuthStore()
@@ -74,15 +92,14 @@ const authStore = useAuthStore()
 const today = new Date()
 const viewDate = ref(new Date(today.getFullYear(), today.getMonth(), 1))
 const selectedDate = ref(new Date(today))
+// viewMode: 'my' (default for regular users) or 'all' (shows everyone)
+const viewMode = ref('my')
 
 //-----------------------------------------------------------
-// évennements en dur pour tester A SUPPRIMER
-const events = ref([
-  { date: '2025-11-15', time: '19:30', title: 'Tech Corp vs Innov Ltd', location: 'Piste 1' },
-  { date: '2025-11-15', time: '18:00', title: 'Entraînement libre', location: 'Piste 2' },
-  { date: '2025-11-22', time: '20:00', title: 'Match amical', location: 'Piste 3' },
-  { date: '2025-11-09', time: '17:00', title: 'Tournoi junior', location: 'Piste 1' }
-])
+// événements récupérés depuis le backend
+const events = ref([])
+const datesWithEvents = ref(new Set())
+const selectedEventsList = ref([])
 //-----------------------------------------------------------
 
 // jours de la semaine pour l'en-tête du calendrier
@@ -144,26 +161,29 @@ function isToday(d) {
 // sélectionne la date d (click de l'utilisateur)
 function selectDate(d) {
   selectedDate.value = new Date(d)
+  loadDayDetails(d)
 }
 
 // aller au mois précédent
 function prevMonth() {
   viewDate.value = new Date(viewDate.value.getFullYear(), viewDate.value.getMonth() - 1, 1)
+  loadEventsRange()
 }
 
 // aller au mois suivant
 function nextMonth() {
   viewDate.value = new Date(viewDate.value.getFullYear(), viewDate.value.getMonth() + 1, 1)
+  loadEventsRange()
 }
 
 // vérification si la date d a des événements
 function hasEvents(d) {
-  return events.value.some(e => e.date === formatYMD(d))
+  return datesWithEvents.value.has(formatYMD(d))
 }
 
-// obtentention des événements pour la date d
+// obtention des événements pour la date d (utilise le détail chargé)
 function eventsFor(d) {
-  return events.value.filter(e => e.date === formatYMD(d))
+  return selectedEventsList.value
 }
 
 // affichage de la date sélectionnée en format lisible
@@ -174,6 +194,116 @@ const selectedDateLabel = computed(() => {
 
 // affichage des événements pour la date sélectionnée
 const selectedEvents = computed(() => eventsFor(selectedDate.value))
+
+// Récupère la liste d'événements / matchs dans l'intervalle affiché
+async function loadEventsRange() {
+  const cells = calendarCells.value
+  if (!cells.length) return
+  const start = formatYMD(cells[0].date)
+  const end = formatYMD(cells[cells.length - 1].date)
+
+  try {
+    if (viewMode.value === 'all') {
+      const resp = await api.get('/events', { params: { start, end } })
+      const data = resp.data
+      // data is list of events; mark dates that have events
+      const s = new Set()
+      for (const ev of data) {
+        if (ev.event_date) s.add(ev.event_date)
+      }
+      datesWithEvents.value = s
+    } else {
+      // my mode: request user's matches and mark their event dates
+      await loadMyEvents()
+    }
+  } catch (err) {
+    console.error('Erreur loadEventsRange', err)
+    // If unauthorized or other error, try loadMyEvents as fallback
+    if (err?.response?.status === 401 || err?.response?.status === 403) {
+      await loadMyEvents()
+    }
+  }
+}
+
+// Récupère les détails (matchs) pour une date sélectionnée
+async function loadDayDetails(d) {
+  const day = formatYMD(d)
+  try {
+    if (viewMode.value === 'all') {
+      const resp = await api.get(`/events/day/${day}`)
+      const payload = resp.data
+      // Mapper les matchs en structure simple pour l'affichage
+      const list = (payload.matches || []).map(m => ({
+        time: m.event_time || '',
+        title: `${m.team1?.company || 'Equipe 1'} vs ${m.team2?.company || 'Equipe 2'}`,
+        location: m.court_number ? `Piste ${m.court_number}` : ''
+      }))
+      selectedEventsList.value = list
+    } else {
+      // my mode: fetch user's matches and filter by date
+      const resp = await api.get('/events/my-events')
+      const payload = resp.data
+      const list = (payload.matches || []).filter(m => {
+        const ed = m.event_date || m.event_date // ensure presence
+        return ed === day
+      }).map(m => ({
+        time: m.event_time || '',
+        title: `${m.team1?.company || 'Equipe 1'} vs ${m.team2?.company || 'Equipe 2'}`,
+        location: m.court_number ? `Piste ${m.court_number}` : ''
+      }))
+      selectedEventsList.value = list
+    }
+  } catch (err) {
+    console.error('Erreur loadDayDetails', err)
+    selectedEventsList.value = []
+  }
+}
+
+// Récupère les matchs de l'utilisateur connecté et marque les dates
+async function loadMyEvents() {
+  try {
+    const resp = await api.get('/events/my-events')
+    const payload = resp.data
+    // payload.matches -> déterminer les dates depuis event_date
+    // NOTE: reset the set so we don't keep previous "all" dates when switching to 'my'
+    const s = new Set()
+    for (const m of payload.matches || []) {
+      if (m.event_date) s.add(m.event_date)
+    }
+    datesWithEvents.value = s
+    // si la date sélectionnée correspond à un des matchs, charger les détails
+    const sel = formatYMD(selectedDate.value)
+    if (s.has(sel)) {
+      await loadDayDetails(selectedDate.value)
+    }
+  } catch (err) {
+    console.error('Erreur loadMyEvents', err)
+  }
+}
+
+onMounted(() => {
+  try { authStore.checkAuth() } catch (e) {}
+  // Default view mode: admins see all, normal users see their matches
+  viewMode.value = authStore.isAdmin ? 'all' : 'my'
+  loadEventsRange()
+  loadDayDetails(selectedDate.value)
+})
+
+watch(viewDate, () => {
+  loadEventsRange()
+})
+
+function setViewMode(mode) {
+  // only allow regular users to toggle; admins forced to 'all'
+  if (authStore.isAdmin) {
+    viewMode.value = 'all'
+  } else {
+    viewMode.value = mode
+  }
+  // reload calendar and selected day details
+  loadEventsRange()
+  loadDayDetails(selectedDate.value)
+}
 
 //c'est déjà la fin :(
 //<3
