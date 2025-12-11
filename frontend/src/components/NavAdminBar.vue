@@ -26,14 +26,6 @@
     </RouterLink>
 
     <RouterLink 
-      to="/matches"
-      class="text-lg font-semibold hover:text-blue-600"
-      :class="{ 'text-blue-600 underline' : isActive('/matches') }"
-    >
-      Matchs
-    </RouterLink>
-
-    <RouterLink 
       to="/users"
       class="text-lg font-semibold hover:text-blue-600"
       :class="{ 'text-blue-600 underline' : isActive('/users/create') }"
