@@ -98,8 +98,8 @@ class Match(Base):
     event_id = Column(Integer, ForeignKey("events.id"), nullable=True)
     court_number = Column(Integer, nullable=False)
     status = Column(String, default=MatchStatus.A_VENIR, nullable=False)
-    score_team1 = Column(Integer, nullable=True)
-    score_team2 = Column(Integer, nullable=True)
+    score_team1 = Column(String, nullable=True)  # Format: "6-4, 6-3" ou "6-4, 3-6, 7-5"
+    score_team2 = Column(String, nullable=True)  # Format: "6-4, 6-3" ou "6-4, 3-6, 7-5"
 
     team1 = relationship("Team", back_populates="matches_as_team1", foreign_keys=[team1_id])
     team2 = relationship("Team", back_populates="matches_as_team2", foreign_keys=[team2_id])

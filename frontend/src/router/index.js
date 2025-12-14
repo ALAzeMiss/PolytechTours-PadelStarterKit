@@ -21,6 +21,7 @@ import PlayerEditPage from '../views/PlayerEditPage.vue'
 import MatchPage from '../views/MatchPage.vue'
 import MatchCreatePage from '../views/MatchCreatePage.vue'
 import MatchEditPage from '../views/MatchEditPage.vue'
+import ResultsPage from '../views/ResultsPage.vue'
 
 const routes = [
   {
@@ -128,6 +129,12 @@ const routes = [
     component: MatchEditPage,
     meta: { requiresAuth: true },
     props: true
+  },
+  {
+    path: '/results',
+    name: 'results',
+    component: ResultsPage,
+    meta: { requiresAuth: true }
   }
   // TODO: Ajouter les autres routes (Planning, Résultats, Admin, Profil)
 ]

@@ -89,6 +89,14 @@ export const matchAPI = {
     api.delete(`/matches/${matchId}`)
 }
 
+export const resultsAPI = {
+  getPersonalResults: (params) =>
+    api.get('/results/personal', { params }),
+
+  getCompanyRanking: () =>
+    api.get('/results/ranking')
+}
+
 export const poolAPI = {
   getPools: () =>
     api.get('/pools'),
