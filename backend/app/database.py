@@ -35,7 +35,7 @@ def init_db():
             admin = User(
                 email="admin@padel.com",
                 password_hash=get_password_hash("Admin@2025!"),
-                role="ADMINISTRATEUR",
+                is_admin=True,
                 is_active=True
             )
             db.add(admin)

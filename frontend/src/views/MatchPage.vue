@@ -1,7 +1,7 @@
 <template>
   <div class="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100">
     <!-- Barre de nav -->
-    <NavBar v-if="authStore.user?.role === 'JOUEUR'" />
+    <NavBar v-if="authStore.user?.is_admin === false" />
     <NavAdminBar v-else />
 
     <div class="p-6">
@@ -10,7 +10,7 @@
         
         <!-- Bouton Ajouter (admin uniquement) -->
         <button 
-          v-if="authStore.user?.role === 'ADMINISTRATEUR'"
+          v-if="authStore.user?.is_admin === true"
           @click="handleCreate"
           class="flex items-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition"
         >
@@ -21,7 +21,7 @@
       <!-- Filtres -->
       <div class="mb-6 p-4 bg-white rounded-lg shadow">
         <!-- Filtre pour les joueurs -->
-        <div v-if="authStore.user?.role === 'JOUEUR'" class="flex items-center gap-2">
+        <div v-if="authStore.user?.is_admin === false" class="flex items-center gap-2">
           <input 
             type="checkbox" 
             id="showAll" 
@@ -94,18 +94,18 @@
               <th class="py-3 px-4 text-left border">Équipes</th>
               <th class="py-3 px-4 text-left border">Joueurs</th>
               <th class="py-3 px-4 text-left border">Statut</th>
-              <th v-if="authStore.user?.role === 'ADMINISTRATEUR'" class="py-3 px-4 text-center border">Actions</th>
+              <th v-if="authStore.user?.is_admin === true" class="py-3 px-4 text-center border">Actions</th>
             </tr>
           </thead>
 
           <tbody>
             <tr v-if="matches.length === 0">
-              <td :colspan="authStore.user?.role === 'ADMINISTRATEUR' ? 6 : 5" class="py-12 px-4 text-center">
+              <td :colspan="authStore.user?.is_admin === true ? 6 : 5" class="py-12 px-4 text-center">
                 <div class="flex flex-col items-center justify-center">
                   <div class="text-6xl mb-4">🎾</div>
                   <p class="text-xl font-semibold text-gray-700 mb-2">Aucun match trouvé</p>
                   <p class="text-sm text-gray-500">
-                    {{ authStore.user?.role === 'JOUEUR' && !showAll 
+                    {{ authStore.user?.is_admin === false && !showAll 
                       ? 'Cochez "Voir tous les matchs" pour voir tous les matchs disponibles' 
                       : 'Il n\'y a aucun match prévu dans les 30 prochains jours' }}
                   </p>
@@ -158,7 +158,7 @@
               </td>
 
               <!-- Actions (admin uniquement) -->
-              <td v-if="authStore.user?.role === 'ADMINISTRATEUR'" class="py-3 px-4">
+              <td v-if="authStore.user?.is_admin === true" class="py-3 px-4">
                 <div class="flex gap-2 justify-center">
                   <button 
                     @click="handleEdit(match.id)" 
@@ -226,12 +226,12 @@ const fetchMatches = async () => {
     const params = {}
     
     // Filtres pour joueurs
-    if (authStore.user?.role === 'JOUEUR') {
+    if (authStore.user?.is_admin === false) {
       params.show_all = showAll.value
     }
     
     // Filtres pour admins
-    if (authStore.user?.role === 'ADMINISTRATEUR') {
+    if (authStore.user?.is_admin === true) {
       if (filters.value.company) params.company = filters.value.company
       if (filters.value.pool_id) params.pool_id = filters.value.pool_id
       if (filters.value.status) params.status = filters.value.status

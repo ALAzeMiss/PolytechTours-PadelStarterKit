@@ -11,9 +11,10 @@ export const useUserStore = defineStore('user', () => {
   const token = ref(null)
   const loading = ref(false)
   const error = ref(null)
+  const users = ref([])
 
   const isAuthenticated = computed(() => !!token.value)
-  const isAdmin = computed(() => user.value?.role === 'ADMINISTRATEUR')
+  const isAdmin = computed(() => user.value?.is_admin === true)
 
   // Créer un utilisateur
   async function createUser(userData) {
@@ -21,9 +22,28 @@ export const useUserStore = defineStore('user', () => {
     error.value = null
     try {
       const res = await userAPI.createUser(userData)
-      return res.data
+      if (res?.data?.user) {
+        users.value.unshift(res.data.user)
+      }
+      return res
     } catch (err) {
       error.value = err.response?.data || 'Erreur lors de la création'
+      throw err
+    } finally {
+      loading.value = false
+    }
+  }
+
+  async function getUsers() {
+    loading.value = true
+    error.value = null
+    try {
+      const res = await userAPI.getUsers()
+      users.value = res.data
+      console.log(res)
+      return res
+    } catch (err) {
+      error.value = err.response?.data || 'Erreur lors de la récupération'
       throw err
     } finally {
       loading.value = false
@@ -63,9 +83,11 @@ export const useUserStore = defineStore('user', () => {
     token,
     loading,
     error,
+    users,
     isAuthenticated,
     isAdmin,
     createUser,
+    getUsers,
     deleteUser,
     regeneratePassword
   }

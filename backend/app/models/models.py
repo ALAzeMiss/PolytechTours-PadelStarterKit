@@ -14,7 +14,7 @@ class User(Base):
     id = Column(Integer, primary_key=True, index=True)
     email = Column(String, unique=True, index=True, nullable=False)
     password_hash = Column(String, nullable=False)
-    role = Column(String, nullable=False)  # JOUEUR ou ADMINISTRATEUR
+    is_admin = Column(Boolean, default=False)  # JOUEUR ou ADMINISTRATEUR
     is_active = Column(Boolean, default=True)
     must_change_password = Column(Boolean, default=False)
     created_at = Column(DateTime(timezone=True), server_default=func.now())
