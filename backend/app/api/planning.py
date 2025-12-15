@@ -19,7 +19,7 @@ def parse_date(s: str):
 	except Exception:
 		raise HTTPException(status_code=400, detail="Format de date attendu: YYYY-MM-DD")
 
-
+# Récupérer les événements et matchs dans une plage de dates
 @router.get("/")
 def events_range(start: str = Query(..., description="YYYY-MM-DD"), end: str = Query(..., description="YYYY-MM-DD"), db: Session = Depends(get_db), current_user: User = Depends(get_current_user)):
 	"""Retourne les événements et matchs entre deux dates (inclusives).
@@ -48,7 +48,7 @@ def events_range(start: str = Query(..., description="YYYY-MM-DD"), end: str = Q
 		ORDER BY e.event_date, e.event_time, m.court_number
 		"""
 	)
-
+	
 	res = db.execute(sql, {"start_date": start_date.isoformat(), "end_date": end_date.isoformat(), "uid": current_user.id}).fetchall()
 
 	# Grouper par event
@@ -79,7 +79,7 @@ def events_range(start: str = Query(..., description="YYYY-MM-DD"), end: str = Q
 
 	return list(events.values())
 
-
+# Récupérer les matchs pour une date donnée
 @router.get("/day/{day}")
 def planning_day(day: str, db: Session = Depends(get_db)):
 	"""Retourne les détails (événements + matchs + équipes) pour une date donnée (YYYY-MM-DD)."""
@@ -126,6 +126,7 @@ def planning_day(day: str, db: Session = Depends(get_db)):
 		if rec["t2_p2_first"]:
 			team2_players.append(f"{rec['t2_p2_first']} {rec['t2_p2_last']}")
 
+		# Ajouter le match avec toutes les infos
 		matches.append({
 			"match_id": rec["match_id"],
 			"court_number": rec["court_number"],
@@ -149,6 +150,7 @@ def planning_day(day: str, db: Session = Depends(get_db)):
 	return {"date": target.isoformat(), "matches": matches}
 
 
+# Récupérer les événements et matchs liés à l'utilisateur connecté
 @router.get("/my-events")
 def my_events(db: Session = Depends(get_db), current_user: User = Depends(get_current_user)):
 	"""Retourne les matchs auxquels l'utilisateur connecté participe.
@@ -198,6 +200,7 @@ def my_events(db: Session = Depends(get_db), current_user: User = Depends(get_cu
 		if rec["t2_p2_first"]:
 			team2_players.append(f"{rec['t2_p2_first']} {rec['t2_p2_last']}")
 
+		# Ajouter le match avec toutes les infos
 		matches.append({
 			"match_id": rec["match_id"],
 			"court_number": rec["court_number"],
