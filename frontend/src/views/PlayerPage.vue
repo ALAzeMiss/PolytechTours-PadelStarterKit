@@ -21,6 +21,7 @@
           <tr>
             <th class="py-2 px-4 border">ID</th>
             <th class="py-2 px-4 border">Nom</th>
+            <th class="py-2 px-4 border">Prénom</th>
             <th class="py-2 px-4 border">Entreprise</th>
             <th class="py-2 px-4 border">N° de Licence</th>
             <th class="py-2 px-4 border">Email</th>
@@ -29,24 +30,19 @@
         </thead>
 
         <tbody>
-          <tr v-for="user in users" :key="user.id" class="hover:bg-gray-50">
-            <td class="py-2 px-4 border">{{ user.id }}</td>
-            <td class="py-2 px-4 border">{{ user.name }}</td>
-            <td class="py-2 px-4 border">{{ user.entreprise }}</td>
-            <td class="py-2 px-4 border">{{ user.licenceNumber }}</td>
-            <td class="py-2 px-4 border">{{ user.email }}</td>
+          <tr v-for="p in store.players" :key="p.id" class="hover:bg-gray-50">
+            <td class="py-2 px-4 border">{{ p.id }}</td>
+            <td class="py-2 px-4 border">{{ p.last_name }}</td>
+            <td class="py-2 px-4 border">{{ p.first_name }}</td>
+            <td class="py-2 px-4 border">{{ p.company }}</td>
+            <td class="py-2 px-4 border">{{ p.license_number }}</td>
+            <td class="py-2 px-4 border">{{ p.email }}</td>
 
             <!-- Actions: Modifier / Supprimer -->
             <td class="py-2 px-4 border flex gap-6 justify-center">
               <!-- Crayon pour modifier -->
-              <button @click="editPlayer(user.id)" class="text-blue-600 hover:text-blue-800 text-xl">
-                ✏️
-              </button>
-
-              <!-- Poubelle pour supprimer -->
-              <button @click="deletePlayer(user.id)" class="text-red-600 hover:text-red-800 text-xl">
-                🗑️
-              </button>
+              <router-link :to="`/players/edit/${p.id}`">✏️</router-link>
+              <button @click="store.deletePlayer(p.id)">🗑️</button>
             </td>
           </tr>
         </tbody>
@@ -55,7 +51,7 @@
 
     <!-- Nombre total de joueurs -->
     <div class="p-6 text-right text-gray-700 font-semibold text-lg">
-      Total joueurs : {{ users.length }}
+      Total joueurs : {{ store.players.length }}
     </div>
 
   </div>
@@ -64,24 +60,19 @@
 <script setup>
 import NavAdminBar from '@/components/NavAdminBar.vue'
 import { useRouter } from 'vue-router'
-import { ref } from 'vue'
+import { onMounted } from 'vue'
+import { usePlayerStore } from "@/stores/player"
 
 const router = useRouter()
+const store = usePlayerStore()
 
-const users = ref([
-  { id: 1, name: 'Alice', entreprise: 'Entreprise A', licenceNumber: '12345', email: 'alice@example.com' },
-  { id: 2, name: 'Bob', entreprise: 'Entreprise B', licenceNumber: '67890', email: 'bob@example.com' }
-])
+onMounted(() => {
+  store.getPlayers()
+})
 
-const handlePlayer = () => router.push('/player/create')
+const handlePlayer = () => router.push('/players/create')
 
-const editPlayer = (id) => {
-  router.push(`/player/edit/${id}`)
-}
 
-const deletePlayer = (id) => {
-  users.value = users.value.filter(user => user.id !== id)
-}
 </script>
 
 <style scoped></style>

@@ -4,7 +4,7 @@
 # ============================================
 
 from pydantic import BaseModel, EmailStr, validator
-from app.schemas.auth import  UserResponse, UserResponse
+from app.schemas.auth import  UserResponse
 import re
 
 
@@ -24,4 +24,13 @@ class CreateUserResponse(BaseModel):
     
     class Config:
         from_attributes = True
+        
+
+class UserSelectResponse(BaseModel):
+    id: int
+    email: str
+
+    class Config:
+        orm_mode = True
+
 

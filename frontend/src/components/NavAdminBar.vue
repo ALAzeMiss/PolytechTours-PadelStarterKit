@@ -2,9 +2,9 @@
   <nav class="bg-white shadow-md py-4 px-6 flex justify-center gap-8">
     
     <RouterLink 
-      to="/player"
+      to="/players"
       class="text-lg font-semibold hover:text-blue-600"
-      :class="{ 'text-blue-600 underline' : isActive('/player') }"
+      :class="{ 'text-blue-600 underline' : isActive('/players') }"
     >
       Joueurs
     </RouterLink>

@@ -9,13 +9,15 @@ from typing import Optional
 class PlayerBase(BaseModel):
     first_name: str
     last_name: str
-    company: Optional[str] = None
+    company: str = None
     license_number: Optional[str] = None
     birth_date: Optional[date] = None
     photo_url: Optional[str] = None
+    email: str = None
 
 class PlayerCreate(PlayerBase):
     user_id: int
+    
 
 class PlayerUpdate(BaseModel):
     first_name: Optional[str] = None

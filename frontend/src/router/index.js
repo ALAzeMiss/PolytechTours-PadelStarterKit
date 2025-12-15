@@ -92,19 +92,19 @@ const routes = [
     props: true
   },
   {
-    path: '/player',
-    name: 'player',
+    path: '/players',
+    name: 'players',
     component: PlayerPage,
     meta: { requiresAuth: true }
   },
   {
-    path: '/player/create',
-    name: 'player_create',
+    path: '/players/create',
+    name: 'players_create',
     component: PlayerCreatePage,
     meta: { requiresAuth: true }
   },
   {
-    path: '/player/edit/:id',
+    path: '/players/edit/:id',
     name: 'edit-player',
     component: PlayerEditPage,
     meta: { requiresAuth: true },

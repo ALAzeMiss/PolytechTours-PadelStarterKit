@@ -29,7 +29,7 @@
           </router-link>
           <router-link 
             v-if="authStore.isAdmin" 
-            to="/player" 
+            to="/players" 
             class="px-3 py-2 rounded hover:bg-blue-700"
           >
             Administration

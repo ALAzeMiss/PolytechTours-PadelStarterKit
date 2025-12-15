@@ -9,7 +9,7 @@ from sqlalchemy.orm import Session
 from app.database import get_db
 from app.models.models import User, LoginAttempt
 from app.schemas.auth import LoginRequest, TokenResponse, UserResponse, ChangePasswordRequest, UserResponse
-from app.schemas.user import CreateUserRequest, CreateUserResponse
+from app.schemas.user import CreateUserRequest, CreateUserResponse, UserSelectResponse
 from app.core.security import verify_password, get_password_hash, create_access_token
 from app.core.security import get_password_hash
 from app.api.deps import get_current_admin
@@ -58,6 +58,12 @@ def createUser(user_data: CreateUserRequest, db: Session = Depends(get_db),curre
         user=UserResponse.from_orm(new_user),
         temporary_password=temporary_password
     )
+
+@router.get("/users/select", response_model=list[UserSelectResponse])
+def get_users_for_select(db: Session = Depends(get_db)):
+    users = db.query(User).all()
+    return users
+
 
 @router.get("/users", response_model=List[UserResponse])
 def getUsers(
