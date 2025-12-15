@@ -209,7 +209,10 @@ async function loadEventsRange() {
       // data is list of events; mark dates that have events
       const s = new Set()
       for (const ev of data) {
-        if (ev.event_date) s.add(ev.event_date)
+        // N'afficher la pastille que si au moins un match est présent
+        if (ev.event_date && Array.isArray(ev.matches) && ev.matches.length > 0) {
+          s.add(ev.event_date)
+        }
       }
       datesWithEvents.value = s
     } else {
