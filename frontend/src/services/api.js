@@ -43,16 +43,53 @@ api.interceptors.response.use(
 export const authAPI = {
   login: (email, password) => 
     api.post('/auth/login', { email, password }),
-  
-  logout: () => 
+
+  logout: () =>
     api.post('/auth/logout'),
-  
+
   changePassword: (currentPassword, newPassword, confirmPassword) =>
     api.post('/auth/change-password', {
       current_password: currentPassword,
       new_password: newPassword,
       confirm_password: confirmPassword
     })
+}
+
+export const userAPI = {
+  createUser: (userData) =>
+    api.post('/users/users', userData),
+
+  getUsers: () =>
+    api.get(`/users/users`),
+
+  getUser: (userId) =>
+    api.get(`/users/users/${userId}`),
+
+  updateUser: (userId, userData) =>
+    api.put(`/users/users/${userId}`, userData),
+
+  deleteUser: (userId) =>
+    api.delete(`/users/users/${userId}`),
+
+  regeneratePassword: () =>
+    api.get('/users/users/generate-password')
+}
+
+export const matchAPI = {
+  getMatches: (params) =>
+    api.get('/matches', { params }),
+
+  getMatch: (matchId) =>
+    api.get(`/matches/${matchId}`),
+
+  createMatch: (matchData) =>
+    api.post('/matches', matchData),
+
+  updateMatch: (matchId, matchData) =>
+    api.patch(`/matches/${matchId}`, matchData),
+
+  deleteMatch: (matchId) =>
+    api.delete(`/matches/${matchId}`)
 }
 
 export default api

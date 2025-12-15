@@ -23,7 +23,11 @@ pnpm-debug.log*
 *.sln
 *.sw?
 
+# Environment variables
 venv/
+backend/venv/
+.env/
+frontend/.env
 
-/backend/.env
-/frontend/.env
+backend/*.db
+backend/**/*.db

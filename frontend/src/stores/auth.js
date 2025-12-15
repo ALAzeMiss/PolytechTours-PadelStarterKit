@@ -13,7 +13,7 @@ export const useAuthStore = defineStore('auth', () => {
   const error = ref(null)
 
   const isAuthenticated = computed(() => !!token.value)
-  const isAdmin = computed(() => user.value?.role === 'ADMINISTRATEUR')
+  const isAdmin = computed(() => user.value?.is_admin === true)
 
   function setAuth(authToken, userData) {
     token.value = authToken
@@ -43,8 +43,10 @@ export const useAuthStore = defineStore('auth', () => {
     loading.value = true
     error.value = null
     
+    console.log(email, password)
     try {
       const response = await authAPI.login(email, password)
+      console.log(response.data)
       const { access_token, user: userData } = response.data
       
       setAuth(access_token, userData)

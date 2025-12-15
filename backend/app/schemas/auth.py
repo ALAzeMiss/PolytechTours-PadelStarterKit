@@ -16,7 +16,7 @@ class Token(BaseModel):
 class UserResponse(BaseModel):
     id: int
     email: str
-    role: str
+    is_admin: bool
     must_change_password: bool
     
     class Config:
