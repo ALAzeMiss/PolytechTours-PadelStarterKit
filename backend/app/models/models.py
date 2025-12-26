@@ -39,7 +39,6 @@ class Player(Base):
     license_number = Column(String, unique=True, nullable=False)
     birth_date = Column(Date, nullable=True)
     photo_url = Column(String, nullable=True)
-    # email = Column(String, unique=True, nullable=False)
     user_id = Column(Integer, ForeignKey("users.id"), unique=True, nullable=False)
     user = relationship("User", backref="player", uselist=False)
 

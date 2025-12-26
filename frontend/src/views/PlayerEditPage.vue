@@ -80,6 +80,28 @@ onMounted(async () => {
 })
 
 async function updatePlayer() {
+  if (!form.value.first_name || !form.value.last_name || !form.value.company) {
+    alert("Veuillez remplir le nom, le prénom et l'entreprise.")
+    return
+  }
+  
+  // Validation des regex
+  const nameRegex = /^[a-zA-ZÀ-ÿ\s'-]{2,50}$/
+  const companyRegex = /^[a-zA-ZÀ-ÿ0-9\s'-]{2,100}$/
+  
+  if (!nameRegex.test(form.value.first_name)) {
+    alert("Le prénom doit contenir entre 2 et 50 caractères, uniquement des lettres, espaces, apostrophes ou tirets.")
+    return
+  }
+  if (!nameRegex.test(form.value.last_name)) {
+    alert("Le nom doit contenir entre 2 et 50 caractères, uniquement des lettres, espaces, apostrophes ou tirets.")
+    return
+  }
+  if (!companyRegex.test(form.value.company)) {
+    alert("L'entreprise doit contenir entre 2 et 100 caractères, uniquement des lettres, chiffres, espaces, apostrophes ou tirets.")
+    return
+  }
+  
   try {
     await store.updatePlayer(playerId, { ...form.value })
     alert("Modifications enregistrées")
