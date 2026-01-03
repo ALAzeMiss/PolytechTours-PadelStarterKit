@@ -1,6 +1,5 @@
 <template>
   <div class="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100">
-    <NavAdminBar />
 
     <div class="max-w-2xl mx-auto p-6">
       <div class="bg-white rounded-lg shadow-lg p-8">
@@ -121,7 +120,6 @@ import { ref, onMounted, computed } from 'vue'
 import { useRouter } from 'vue-router'
 import { matchAPI } from '@/services/api'
 import api from '@/services/api'
-import NavAdminBar from '@/components/NavAdminBar.vue'
 
 const router = useRouter()
 
