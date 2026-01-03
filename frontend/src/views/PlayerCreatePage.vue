@@ -77,7 +77,8 @@ import { ref, onMounted, computed } from 'vue'
 
 // Définir les données avec ref
 const router = useRouter()
-const store = usePlayerStore()
+const playerStore = usePlayerStore()
+
 
 const users = ref([])
 const search = ref('')
@@ -163,12 +164,12 @@ async function handleValider() {
   if (!data.license_number) delete data.license_number
   
   try {
-    await store.createPlayer(data)
+    await playerStore.createPlayer(data)
     alert("Le joueur " + form.value.first_name + " " + form.value.last_name + " a bien été créé !")
     router.push("/players")
   } catch (err) {
-    console.error(err)
-    alert("Erreur lors de la création du joueur")
+    console.error("Erreur détaillée:", err.response?.data || err.message)
+    alert("Erreur lors de la création du joueur: " + (err.response?.data?.detail || err.message))
   }
 }
 </script>

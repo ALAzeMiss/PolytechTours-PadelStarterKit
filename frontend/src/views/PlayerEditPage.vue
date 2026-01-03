@@ -29,8 +29,25 @@
         </div>
 
         <div>
-          <label class="block mb-1 font-medium">Email</label>
-          <input v-model="form.email" type="email" class="w-full p-2 rounded border" />
+          <label class="block mb-1 font-medium">Utilisateur (email)</label>
+          <input
+            v-model="search"
+            type="text"
+            class="w-full p-2 rounded border"
+            placeholder="Rechercher un email"
+            @focus="showDropdown = true"
+            @blur="hideDropdown"
+          />
+          <div v-if="showDropdown && filteredUsers.length" class="border rounded mt-1 max-h-40 overflow-y-auto bg-white">
+            <div
+              v-for="user in filteredUsers"
+              :key="user.id"
+              @mousedown="selectUser(user)"
+              class="p-2 hover:bg-gray-100 cursor-pointer"
+            >
+              {{ user.email }}
+            </div>
+          </div>
         </div>
 
         <div class="flex justify-center">
@@ -48,8 +65,8 @@
 
 <script setup>
 import NavAdminBar from '@/components/NavAdminBar.vue'
-import { ref, onMounted } from 'vue'
-import { playerAPI } from "@/services/api"
+import { ref, onMounted, computed } from 'vue'
+import { userAPI } from "@/services/api"
 import { usePlayerStore } from '@/stores/player'
 import { useRoute, useRouter } from 'vue-router'
 
@@ -57,6 +74,17 @@ const route = useRoute()
 const router = useRouter()  
 const playerId = route.params.id
 const store = usePlayerStore()
+
+const users = ref([])
+const search = ref('')
+const showDropdown = ref(false)
+
+const filteredUsers = computed(() => {
+  if (!search.value) return users.value
+  return users.value.filter(user => 
+    user.email.toLowerCase().includes(search.value.toLowerCase())
+  )
+})
 
 const form = ref({
   first_name: "",
@@ -73,11 +101,32 @@ onMounted(async () => {
   try {
     const res = await store.getPlayer(playerId)
     form.value = { ...res } // remplit automatiquement le formulaire
+    search.value = res.email // pré-remplit le champ de recherche avec l'email actuel
   } catch (err) {
     console.error(err)
     alert("Impossible de récupérer les informations du joueur")
   }
+
+  try {
+    const response = await userAPI.getUsersForSelect()
+    users.value = response.data
+  } catch (err) {
+    console.error(err)
+    alert("Impossible de récupérer les utilisateurs pour la sélection.")
+  }
 })
+
+function selectUser(user) {
+  form.value.user_id = user.id
+  search.value = user.email
+  showDropdown.value = false
+}
+
+function hideDropdown() {
+  setTimeout(() => {
+    showDropdown.value = false
+  }, 150)
+}
 
 async function updatePlayer() {
   if (!form.value.first_name || !form.value.last_name || !form.value.company) {

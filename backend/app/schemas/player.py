@@ -42,19 +42,19 @@ class PlayerBase(BaseModel):
             raise ValueError('Nom d\'entreprise invalide')
         return v
 
+class PlayerCreate(PlayerBase):
+    user_id: int
+
     @field_validator('license_number')
     @classmethod
     def validate_license_number(cls, v):
         if v is not None:
-            if not v.strip():
+            v = v.strip().upper()
+            if not v:
                 raise ValueError('Veuillez renseigner une licence')
             if not re.match(r'^L\d{6}$', v):
                 raise ValueError('Licence invalide')
         return v
-    email: Optional[str] = None
-
-class PlayerCreate(PlayerBase):
-    user_id: int
     
 
 class PlayerUpdate(BaseModel):
@@ -65,6 +65,17 @@ class PlayerUpdate(BaseModel):
     birth_date: Optional[date] = None
     photo_url: Optional[str] = None
     user_id: Optional[int] = None
+
+    @field_validator('license_number')
+    @classmethod
+    def validate_license_number(cls, v):
+        if v is not None:
+            v = v.strip().upper()
+            if not v:
+                raise ValueError('Veuillez renseigner une licence')
+            if not re.match(r'^L\d{6}$', v):
+                raise ValueError('Licence invalide')
+        return v
 
 class PlayerResponse(PlayerBase):
     id: int
