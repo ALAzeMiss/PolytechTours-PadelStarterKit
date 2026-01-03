@@ -2,7 +2,7 @@
   <div class="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100">
     <!-- Barre de nav -->
     <NavBar v-if="authStore.user?.is_admin === false" />
-    <NavAdminBar v-else />
+
 
     <div class="p-6">
       <div class="flex justify-between items-center mb-4">
@@ -192,7 +192,6 @@ import { useRouter } from 'vue-router'
 import { useAuthStore } from '@/stores/auth'
 import { matchAPI } from '@/services/api'
 import NavBar from '@/components/NavBar.vue'
-import NavAdminBar from '@/components/NavAdminBar.vue'
 
 const router = useRouter()
 const authStore = useAuthStore()

@@ -71,7 +71,7 @@ def get_upcoming_matches(
         query = query.filter(Match.status == status_filter)
     
     # Si l'utilisateur est un joueur et ne veut pas voir tous les matchs
-    if user and user.is_admin == False and not show_all:
+    if user and not user.is_admin and not show_all:
         # Récupérer le joueur associé à cet utilisateur
         player = db.query(Player).filter(Player.user_id == user.id).first()
         if player:

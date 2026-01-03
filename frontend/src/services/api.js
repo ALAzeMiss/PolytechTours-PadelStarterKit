@@ -72,7 +72,10 @@ export const userAPI = {
     api.delete(`/users/users/${userId}`),
 
   regeneratePassword: () =>
-    api.get('/users/users/generate-password')
+    api.get('/users/users/generate-password'),
+
+  getUsersForSelect: () =>
+    api.get('/users/users/select')
 }
 
 export const matchAPI = {
@@ -91,5 +94,23 @@ export const matchAPI = {
   deleteMatch: (matchId) =>
     api.delete(`/matches/${matchId}`)
 }
+
+export const playerAPI = {
+  getPlayers: () =>
+    api.get("/players/players"),
+
+  getPlayer: (id) =>
+    api.get(`/players/players/${id}`),
+
+  createPlayer: (data) =>
+    api.post("/players/players", data),
+
+  updatePlayer: (id, data) =>
+    api.put(`/players/players/${id}`, data),
+
+  deletePlayer: (id) =>
+    api.delete(`/players/players/${id}`)
+}
+
 
 export default api

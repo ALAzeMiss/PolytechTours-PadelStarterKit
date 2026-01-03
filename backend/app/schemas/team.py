@@ -9,6 +9,7 @@ from app.schemas.player import PlayerInfo
 class TeamBase(BaseModel):
     company: Optional[str] = None
     pool_id: Optional[int] = None
+    
 
 class TeamCreate(TeamBase):
     player1_id: int

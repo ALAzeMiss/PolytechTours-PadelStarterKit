@@ -30,19 +30,17 @@ class LoginAttempt(Base):
     locked_until = Column(DateTime(timezone=True), nullable=True)
 
 
-
 class Player(Base):
-    __tablename__ = "player"
-    
+    __tablename__ = "players"
     id = Column(Integer, primary_key=True, index=True)
     first_name = Column(String, nullable=False)
     last_name = Column(String, nullable=False)
     company = Column(String, nullable=False)
     license_number = Column(String, unique=True, nullable=False)
-    birth_date = Column(Date, nullable=False)
+    birth_date = Column(Date, nullable=True)
     photo_url = Column(String, nullable=True)
     user_id = Column(Integer, ForeignKey("users.id"), unique=True, nullable=False)
-    user = relationship("User")
+    user = relationship("User", backref="player", uselist=False)
 
 
 class Pool(Base):
@@ -59,8 +57,8 @@ class Team(Base):
     
     id = Column(Integer, primary_key=True, index=True)
     company = Column(String, nullable=False)
-    player1_id = Column(Integer, ForeignKey("player.id"), nullable=False)
-    player2_id = Column(Integer, ForeignKey("player.id"), nullable=False)
+    player1_id = Column(Integer, ForeignKey("players.id"), nullable=False)
+    player2_id = Column(Integer, ForeignKey("players.id"), nullable=False)
 
     pool_id = Column(Integer, ForeignKey("pools.id"), nullable=True)
 

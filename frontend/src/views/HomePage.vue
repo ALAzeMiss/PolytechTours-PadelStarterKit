@@ -70,7 +70,7 @@
 
         <div v-if="authStore.isAdmin" class="mt-8">
           <router-link 
-            to="/joueur" 
+            to="/players" 
             class="inline-block px-8 py-3 bg-green-600 text-white rounded-lg font-semibold hover:bg-green-700 transition-colors shadow-lg"
           >
             🔧 Accéder à l'administration
