@@ -129,4 +129,21 @@ export const teamAPI = {
     api.delete(`/teams/teams/${id}`)
 }
 
+export const poolAPI = {
+  getPools: () =>
+    api.get("/pools/pools"),
+
+  getPool: (id) =>
+    api.get(`/pools/pools/${id}`),
+
+  createPool: (data) =>
+    api.post("/pools/pools", data),
+
+  updatePool: (id, data) =>
+    api.put(`/pools/pools/${id}`, data),
+
+  deletePool: (id) =>
+    api.delete(`/pools/pools/${id}`)
+}
+
 export default api

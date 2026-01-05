@@ -19,25 +19,27 @@
       <table class="min-w-full bg-white border border-gray-300 rounded-lg shadow mx-2">
         <thead class="bg-light-100">
           <tr>
-            <th class="py-2 px-4 border">ID</th>
-            <th class="py-2 px-4 border">Équipe</th>
+            <th class="py-2 px-4 border">Nom</th>
+            <th class="py-2 px-4 border">Équipes</th>
           </tr>
         </thead>
 
         <tbody>
-          <tr v-for="poule in poules" :key="poule.id" class="hover:bg-gray-50">
-            <td class="py-2 px-4 border">{{ poule.id }}</td>
-            <td class="py-2 px-4 border">{{ poule.team }}</td>
+          <tr v-for="pool in poolStore.pools" :key="pool.id" class="hover:bg-gray-50">
+            <td class="py-2 px-4 border">{{ pool.name }}</td>
+            <td class="py-2 px-4 border">
+              <div v-for="team in getTeamsForPool(pool.id)" :key="team.id" class="mb-1">
+                {{ team.company }} ({{ team.player1_name }} / {{ team.player2_name }})
+              </div>
+            </td>
 
             <!-- Actions: Modifier / Supprimer -->
             <td class="py-2 px-4 border flex gap-6 justify-center">
               <!-- Crayon pour modifier -->
-              <button @click="editPoule(poule.id)" class="text-blue-600 hover:text-blue-800 text-xl">
-                ✏️
-              </button>
+              <router-link :to="`/poule/edit/${pool.id}`">✏️</router-link>
 
               <!-- Poubelle pour supprimer -->
-              <button @click="deletePoule(poule.id)" class="text-red-600 hover:text-red-800 text-xl">
+              <button @click="poolStore.deletePool(pool.id)" class="text-red-600 hover:text-red-800 text-xl">
                 🗑️
               </button>
             </td>
@@ -53,8 +55,37 @@
 <script setup>
 import NavAdminBar from '@/components/NavAdminBar.vue'
 import { useRouter } from 'vue-router'
+import { onMounted, computed } from 'vue'
+import { usePoolStore } from '../stores/pool'
+import { useTeamStore } from '../stores/team'
 
 const router = useRouter()
+const poolStore = usePoolStore()
+const teamStore = useTeamStore()
+
+onMounted(async () => {
+  await poolStore.getPools()
+  await teamStore.getTeams()
+  
+  // Enrich teams with player names
+  try {
+    const playersResponse = await fetch('/api/v1/players/players')
+    const players = await playersResponse.json()
+    
+    teamStore.teams.forEach(team => {
+      const player1 = players.find(p => p.id === team.player1_id)
+      const player2 = players.find(p => p.id === team.player2_id)
+      team.player1_name = player1 ? `${player1.first_name} ${player1.last_name}` : 'Inconnu'
+      team.player2_name = player2 ? `${player2.first_name} ${player2.last_name}` : 'Inconnu'
+    })
+  } catch (err) {
+    console.error('Erreur lors de la récupération des joueurs:', err)
+  }
+})
+
+const getTeamsForPool = (poolId) => {
+  return teamStore.teams.filter(team => team.pool_id === poolId)
+}
 
 const handlePoule = () => router.push('/poule/create')
 </script>

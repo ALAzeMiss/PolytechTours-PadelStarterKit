@@ -2,7 +2,7 @@ from fastapi import FastAPI, Request, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse
 from app.core.config import settings
-from app.api import auth, user, match, player, team
+from app.api import auth, user, match, player, team, pool
 from app.database import engine
 from app.models import models
 
@@ -61,6 +61,7 @@ app.include_router(user.router, prefix="/api/v1/users", tags=["Creation Users"])
 app.include_router(match.router, prefix="/api/v1/matches", tags=["Creation Matches"])
 app.include_router(player.router, prefix="/api/v1/players", tags=["players"])
 app.include_router(team.router, prefix="/api/v1/teams", tags=["teams"])
+app.include_router(pool.router, prefix="/api/v1/pools", tags=["pools"])
 
 
 @app.get("/")
