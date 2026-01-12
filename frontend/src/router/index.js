@@ -36,6 +36,21 @@ const routes = [
     meta: { requiresAuth: false }
   },
   {
+<<<<<<< HEAD
+    path: '/user/create',
+    name: 'user_create',
+    component: UserCreatePage,
+    meta: { requiresAuth: false }
+  },
+  {
+    path: '/planning',
+    name: 'planning',
+    component: PlanningPage,
+    meta: { requiresAuth: true }
+  },
+  {
+=======
+>>>>>>> main
     path: '/admin',
     name: 'admin',
     component: AdminPage,

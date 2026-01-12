@@ -25,9 +25,8 @@ pnpm-debug.log*
 
 # Environment variables
 venv/
-backend/venv/
-.env/
-frontend/.env
+/backend/.env
+/backend/venv/
 
-backend/*.db
-backend/**/*.db
+/frontend/.env
+/frontend/venv/
