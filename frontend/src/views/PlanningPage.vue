@@ -1,7 +1,3 @@
-// ============================================
-// FICHIER : frontend/src/views/PlanningPage.vue
-// ============================================
-
 <template>
   <div class="min-h-screen flex items-start justify-center bg-gradient-to-br from-blue-50 to-indigo-100 py-8">
     <div class="w-full max-w-5xl mx-auto p-6">

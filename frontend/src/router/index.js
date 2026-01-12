@@ -18,6 +18,7 @@ import PouleEditPage from '../views/PouleEditPage.vue'
 import PlayerPage from '../views/PlayerPage.vue'
 import PlayerCreatePage from '../views/PlayerCreatePage.vue'
 import PlayerEditPage from '../views/PlayerEditPage.vue'
+import PlanningPage from '../views/PlanningPage.vue'
 import MatchPage from '../views/MatchPage.vue'
 import MatchCreatePage from '../views/MatchCreatePage.vue'
 import MatchEditPage from '../views/MatchEditPage.vue'
@@ -36,7 +37,6 @@ const routes = [
     meta: { requiresAuth: false }
   },
   {
-<<<<<<< HEAD
     path: '/user/create',
     name: 'user_create',
     component: UserCreatePage,
@@ -49,8 +49,6 @@ const routes = [
     meta: { requiresAuth: true }
   },
   {
-=======
->>>>>>> main
     path: '/admin',
     name: 'admin',
     component: AdminPage,
