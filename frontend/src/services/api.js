@@ -112,5 +112,38 @@ export const playerAPI = {
     api.delete(`/players/players/${id}`)
 }
 
+export const teamAPI = {
+  getTeams: () =>
+    api.get("/teams/teams"),
+
+  getTeam: (id) =>
+    api.get(`/teams/teams/${id}`),
+
+  createTeam: (data) =>
+    api.post("/teams/teams", data),
+
+  updateTeam: (id, data) =>
+    api.put(`/teams/teams/${id}`, data),
+  
+  deleteTeam: (id) =>
+    api.delete(`/teams/teams/${id}`)
+}
+
+export const poolAPI = {
+  getPools: () =>
+    api.get("/pools/pools"),
+
+  getPool: (id) =>
+    api.get(`/pools/pools/${id}`),
+
+  createPool: (data) =>
+    api.post("/pools/pools", data),
+
+  updatePool: (id, data) =>
+    api.put(`/pools/pools/${id}`, data),
+
+  deletePool: (id) =>
+    api.delete(`/pools/pools/${id}`)
+}
 
 export default api
