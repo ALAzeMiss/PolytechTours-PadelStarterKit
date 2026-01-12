@@ -26,7 +26,7 @@ def test_password_hashing():
 
 def test_jwt_token_creation():
     """Test de la création de token JWT"""
-    data = {"sub": "123", "email": "test@example.com", "role": "JOUEUR"}
+    data = {"sub": "123", "email": "test@example.com", "is_admin": False}
     token = create_access_token(data)
     
     assert token is not None
@@ -35,14 +35,14 @@ def test_jwt_token_creation():
 
 def test_jwt_token_decode():
     """Test du décodage de token JWT"""
-    data = {"sub": "123", "email": "test@example.com", "role": "JOUEUR"}
+    data = {"sub": "123", "email": "test@example.com", "is_admin": False}
     token = create_access_token(data)
     
     decoded = decode_token(token)
     assert decoded is not None
     assert decoded["sub"] == "123"
     assert decoded["email"] == "test@example.com"
-    assert decoded["role"] == "JOUEUR"
+    assert decoded["is_admin"] == False
 
 def test_jwt_invalid_token():
     """Test avec un token invalide"""

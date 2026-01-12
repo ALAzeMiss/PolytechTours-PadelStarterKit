@@ -1,59 +1,101 @@
 <template>
-  <div class="min-h-screen flex items-center justify-center bg-gradient-to-br from-blue-50 to-indigo-100">
-    <div class="max-w-4xl mx-auto p-8 text-center">
+  <div class="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100">
+    <NavAdminBar />
 
-      <!-- Image ou logo -->
-      <div class="mb-20">
-        <div class="w-48 h-48 mx-auto bg-blue-600 rounded-full flex items-center justify-center text-white text-8xl shadow-2xl">
-          🎾
-        </div>
+    <div class="max-w-6xl mx-auto p-10 grid grid-cols-1 md:grid-cols-2 gap-10">
+      <!-- Colonne gauche : Liste des utilisateurs -->
+      <div class="bg-white p-8 rounded-2xl shadow-xl">
+        <h2 class="text-3xl font-bold mb-6 text-gray-800">Liste des utilisateurs</h2>
+
+        <ul class="space-y-3">
+          <li
+            v-for="user in userStore.users"
+            :key="user.id"
+            class="flex justify-between items-center p-3 border rounded-lg"
+          >
+            <div>
+              <p class="font-semibold">{{ user.email }}</p>
+              <p class="text-sm text-gray-500">
+                Role: {{ user.is_admin ? 'Admin' : 'Utilisateur' }}
+              </p>
+            </div>
+
+            <button
+              class="px-4 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700"
+              @click="regeneratePassword(user.id)"
+            >
+              Nouveau mot de passe
+            </button>
+          </li>
+        </ul>
       </div>
 
-      <!-- Message de Création -->
-      <h1 class="text-5xl font-bold text-gray-800 mb-4">
-        Création de User
-      </h1>
+      <!-- Colonne droite : Création utilisateur -->
+      <div class="bg-white p-8 rounded-2xl shadow-xl">
+        <h2 class="text-3xl font-bold mb-6 text-gray-800">Créer un utilisateur</h2>
 
-      <!-- Contenu conditionnel -->
-      <div v-if="authStore.isAuthenticated" class="space-y-4">
-
-        <!-- Email -->
-          <div class="mb-4">
-            <label for="email" class="block text-sm font-medium text-gray-700 mb-2">
-              Email
-            </label>
+        <div class="space-y-4">
+          <div>
+            <label class="block text-sm font-medium text-gray-700 mb-2">Email</label>
             <input
-              id="email"
               v-model="email"
               type="email"
-              required
-              class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-              placeholder="votre@email.com"
+              placeholder="email@example.com"
+              class="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500"
             />
           </div>
 
-        <label>
-          <input type="checkbox" v-model="is_Admin" />
-            Compte administrateur
-        </label>
+          <label class="flex items-center space-x-2">
+            <input type="checkbox" v-model="is_admin" />
+            <span>Compte administrateur</span>
+          </label>
 
-        <!--<p>Valeur : {{is_Admin}}</p> -->
+          <button
+            class="w-full py-3 bg-blue-600 text-white rounded-lg font-semibold hover:bg-blue-700 transition"
+            @click="handleCreateUser"
+          >
+            Ajouter un profil
+          </button>
+        </div>
       </div>
-
-      <button
-        type="submit"
-        
-        class="w-full py-3 bg-blue-600 text-white rounded-lg font-semibold hover:bg-blue-700 transition-colors disabled:bg-gray-400 disabled:cursor-not-allowed"
-      >
-        <span>Se connecter</span>
-      </button>
-
     </div>
   </div>
 </template>
 
 <script setup>
-import { useAuthStore } from '../stores/auth'
+import NavAdminBar from '@/components/NavAdminBar.vue'
+import { onMounted, ref } from 'vue'
+import { useUserStore } from '../stores/user.js'
 
-const authStore = useAuthStore()
+const userStore = useUserStore()
+
+onMounted(() => {
+  userStore.getUsers()
+})
+
+// Champs pour création
+const email = ref('')
+const is_admin = ref(false)
+
+const handleCreateUser = async () => {
+  const result = await userStore.createUser({
+    email: email.value,
+    is_admin: is_admin.value,
+  })
+
+  if (result.status === 200) {
+    alert(
+      `L'utilisateur ${email.value} a été créé.\nMot de passe temporaire : ${result.data.temporary_password}`
+    )
+
+    email.value = ''
+    is_admin.value = false
+  } else {
+    alert('Erreur : ' + result.error)
+  }
+}
+
+function regeneratePassword(userId) {
+  console.log('Nouveau mot de passe généré pour', userId)
+}
 </script>

@@ -43,16 +43,107 @@ api.interceptors.response.use(
 export const authAPI = {
   login: (email, password) => 
     api.post('/auth/login', { email, password }),
-  
-  logout: () => 
+
+  logout: () =>
     api.post('/auth/logout'),
-  
+
   changePassword: (currentPassword, newPassword, confirmPassword) =>
     api.post('/auth/change-password', {
       current_password: currentPassword,
       new_password: newPassword,
       confirm_password: confirmPassword
     })
+}
+
+export const userAPI = {
+  createUser: (userData) =>
+    api.post('/users/users', userData),
+
+  getUsers: () =>
+    api.get(`/users/users`),
+
+  getUser: (userId) =>
+    api.get(`/users/users/${userId}`),
+
+  updateUser: (userId, userData) =>
+    api.put(`/users/users/${userId}`, userData),
+
+  deleteUser: (userId) =>
+    api.delete(`/users/users/${userId}`),
+
+  regeneratePassword: () =>
+    api.get('/users/users/generate-password'),
+
+  getUsersForSelect: () =>
+    api.get('/users/users/select')
+}
+
+export const matchAPI = {
+  getMatches: (params) =>
+    api.get('/matches', { params }),
+
+  getMatch: (matchId) =>
+    api.get(`/matches/${matchId}`),
+
+  createMatch: (matchData) =>
+    api.post('/matches', matchData),
+
+  updateMatch: (matchId, matchData) =>
+    api.patch(`/matches/${matchId}`, matchData),
+
+  deleteMatch: (matchId) =>
+    api.delete(`/matches/${matchId}`)
+}
+
+export const playerAPI = {
+  getPlayers: () =>
+    api.get("/players/players"),
+
+  getPlayer: (id) =>
+    api.get(`/players/players/${id}`),
+
+  createPlayer: (data) =>
+    api.post("/players/players", data),
+
+  updatePlayer: (id, data) =>
+    api.put(`/players/players/${id}`, data),
+
+  deletePlayer: (id) =>
+    api.delete(`/players/players/${id}`)
+}
+
+export const teamAPI = {
+  getTeams: () =>
+    api.get("/teams/teams"),
+
+  getTeam: (id) =>
+    api.get(`/teams/teams/${id}`),
+
+  createTeam: (data) =>
+    api.post("/teams/teams", data),
+
+  updateTeam: (id, data) =>
+    api.put(`/teams/teams/${id}`, data),
+  
+  deleteTeam: (id) =>
+    api.delete(`/teams/teams/${id}`)
+}
+
+export const poolAPI = {
+  getPools: () =>
+    api.get("/pools/pools"),
+
+  getPool: (id) =>
+    api.get(`/pools/pools/${id}`),
+
+  createPool: (data) =>
+    api.post("/pools/pools", data),
+
+  updatePool: (id, data) =>
+    api.put(`/pools/pools/${id}`, data),
+
+  deletePool: (id) =>
+    api.delete(`/pools/pools/${id}`)
 }
 
 export default api

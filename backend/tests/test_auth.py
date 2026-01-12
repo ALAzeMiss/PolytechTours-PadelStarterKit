@@ -17,7 +17,7 @@ def test_login_success(client, test_user):
     assert "access_token" in data
     assert data["token_type"] == "bearer"
     assert data["user"]["email"] == "test@example.com"
-    assert data["user"]["role"] == "JOUEUR"
+    assert data["user"]["is_admin"] == False
 
 def test_login_invalid_email(client, test_user):
     """Test connexion avec email invalide"""
