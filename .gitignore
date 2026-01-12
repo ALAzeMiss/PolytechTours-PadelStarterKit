@@ -27,5 +27,6 @@ pnpm-debug.log*
 venv/
 /backend/.env
 /backend/venv/
+
 /frontend/.env
 /frontend/venv/
