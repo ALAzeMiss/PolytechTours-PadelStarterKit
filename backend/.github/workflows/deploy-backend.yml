@@ -1,0 +1,80 @@
+name: Deploy Backend
+
+on:
+  push:
+    branches: ["main"]
+    paths:
+      - "backend/**"
+      - ".github/workflows/deploy-backend.yml"
+  workflow_dispatch:
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        python-version: [3.11]
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: ${{ matrix.python-version }}
+
+      - name: Cache pip
+        uses: actions/cache@v4
+        with:
+          path: ~/.cache/pip
+          key: ${{ runner.os }}-pip-${{ hashFiles('**/backend/requirements.txt') }}
+          restore-keys: |
+            ${{ runner.os }}-pip-
+
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r backend/requirements.txt
+
+      - name: Run tests
+        run: |
+          cd backend
+          pytest -q --maxfail=1
+
+  deploy:
+    needs: test
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Deploy to production
+        run: |
+          echo "Deploying backend to production..."
+          # Configure your deployment here:
+          # Option 1: Heroku
+          # - name: Deploy to Heroku
+          #   env:
+          #     HEROKU_API_KEY: ${{ secrets.HEROKU_API_KEY }}
+          #   run: |
+          #     git remote add heroku https://git.heroku.com/your-app-name.git
+          #     git push heroku main
+          #
+          # Option 2: Railway
+          # - name: Deploy to Railway
+          #   env:
+          #     RAILWAY_TOKEN: ${{ secrets.RAILWAY_TOKEN }}
+          #   run: |
+          #     npx railway@latest link --environmentName production
+          #     npx railway@latest up --detach
+          #
+          # Option 3: Docker + Cloud Run / Container Registry
+          # - name: Deploy to Cloud Run
+          #   env:
+          #     GCP_PROJECT_ID: ${{ secrets.GCP_PROJECT_ID }}
+          #   run: |
+          #     # Build and push Docker image
+          #     docker build -t gcr.io/$GCP_PROJECT_ID/padel-api backend/
+          #     docker push gcr.io/$GCP_PROJECT_ID/padel-api
