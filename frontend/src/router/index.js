@@ -22,6 +22,7 @@ import PlanningPage from '../views/PlanningPage.vue'
 import MatchPage from '../views/MatchPage.vue'
 import MatchCreatePage from '../views/MatchCreatePage.vue'
 import MatchEditPage from '../views/MatchEditPage.vue'
+import ChangePasswordPage from '../views/ChangePasswordPage.vue'
 
 const routes = [
   {
@@ -141,6 +142,12 @@ const routes = [
     component: MatchEditPage,
     meta: { requiresAuth: true },
     props: true
+  },
+  {
+    path: '/change-password',
+    name: 'change_password',
+    component: ChangePasswordPage,
+    meta: { requiresAuth: true }
   }
   // TODO: Ajouter les autres routes (Planning, Résultats, Admin, Profil)
 ]
@@ -151,16 +158,50 @@ const router = createRouter({
 })
 
 // Navigation guard pour protéger les routes
+// router.beforeEach((to, from, next) => {
+//   const authStore = useAuthStore()
+
+//   if (to.meta.requiresAuth && !authStore.isAuthenticated) {
+//     next('/login')
+//   } else if (to.path === '/login' && authStore.isAuthenticated) {
+//     next('/')
+//   } else {
+//     next()
+//   }
+// })
+
 router.beforeEach((to, from, next) => {
   const authStore = useAuthStore()
 
-  if (to.meta.requiresAuth && !authStore.isAuthenticated) {
-    next('/login')
-  } else if (to.path === '/login' && authStore.isAuthenticated) {
-    next('/')
-  } else {
-    next()
+  // Important: recharge token/user depuis localStorage si refresh
+  authStore.checkAuth()
+
+  const isLoggedIn = authStore.isAuthenticated
+  const mustChange = authStore.user?.must_change_password === true
+
+  // 1) Si route protégée et pas connecté => login
+  if (to.meta.requiresAuth && !isLoggedIn) {
+    return next('/login')
   }
+
+  // 2) Si connecté, empêcher d'aller sur /login
+  if (to.path === '/login' && isLoggedIn) {
+    // si il doit changer mdp, on l'envoie là-bas
+    return next(mustChange ? '/change-password' : '/')
+  }
+
+  // 3) Si connecté mais doit changer mdp => forcer /change-password
+  if (isLoggedIn && mustChange && to.path !== '/change-password') {
+    return next('/change-password')
+  }
+
+  // 4) (Optionnel) Si mdp déjà changé, empêcher de revenir sur /change-password
+  if (isLoggedIn && !mustChange && to.path === '/change-password') {
+    return next('/')
+  }
+
+  return next()
 })
+
 
 export default router

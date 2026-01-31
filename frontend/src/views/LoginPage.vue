@@ -104,7 +104,11 @@ const handleLogin = async () => {
   const result = await authStore.login(email.value, password.value)
 
   if (result.success) {
-    router.push('/')
+    if (result.user?.must_change_password) {
+      router.push('/change-password')
+    } else {
+      router.push('/')
+    }
   } else {
     errorMessage.value = result.error || 'Erreur de connexion'
     attemptsRemaining.value = result.attemptsRemaining ?? null

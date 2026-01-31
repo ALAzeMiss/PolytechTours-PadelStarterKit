@@ -42,22 +42,20 @@ export const useAuthStore = defineStore('auth', () => {
   async function login(email, password) {
     loading.value = true
     error.value = null
-    
-    console.log(email, password)
+
     try {
       const response = await authAPI.login(email, password)
-      console.log(response.data)
       const { access_token, user: userData } = response.data
-      
+
       setAuth(access_token, userData)
-      return { success: true }
+      return { success: true, user: userData }
     } catch (err) {
       const errorData = err.response?.data?.detail
-      
+
       if (typeof errorData === 'object') {
         error.value = errorData.message || 'Erreur de connexion'
-        return { 
-          success: false, 
+        return {
+          success: false,
           error: errorData.message,
           attemptsRemaining: errorData.attempts_remaining,
           minutesRemaining: errorData.minutes_remaining

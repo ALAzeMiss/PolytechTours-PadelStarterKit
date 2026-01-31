@@ -18,8 +18,8 @@ class MatchBase(BaseModel):
     match_time: Union[time, str] = Field(..., description="Heure du match (HH:MM)")
     court_number: int = Field(..., ge=1, le=10, description="Numéro de piste (1-10)")
     status: MatchStatus = MatchStatus.A_VENIR
-    score_team1: Optional[int] = Field(None, ge=0)
-    score_team2: Optional[int] = Field(None, ge=0)
+    score_team1: Optional[str] = Field(None, description='Format: "6-4, 3-6, 7-5"')
+    score_team2: Optional[str] = Field(None, description='Format: "4-6, 6-3, 5-7"')
 
     @field_validator('match_time', mode='before')
     @classmethod
@@ -55,8 +55,8 @@ class MatchUpdate(BaseModel):
     match_time: Optional[time] = None
     court_number: Optional[int] = Field(None, ge=1, le=10)
     status: Optional[MatchStatus] = None
-    score_team1: Optional[int] = Field(None, ge=0)
-    score_team2: Optional[int] = Field(None, ge=0)
+    score_team1: Optional[str] = Field(None, description='Format: "6-4, 3-6, 7-5"')
+    score_team2: Optional[str] = Field(None, description='Format: "4-6, 6-3, 5-7"')
 
 class MatchResponse(MatchBase):
     id: int
@@ -74,8 +74,8 @@ class MatchDetailResponse(BaseModel):
     match_time: time
     court_number: int
     status: MatchStatus
-    score_team1: Optional[int]
-    score_team2: Optional[int]
+    score_team1: Optional[str]
+    score_team2: Optional[str]
     team1: TeamInfo
     team2: TeamInfo
     event_id: Optional[int]

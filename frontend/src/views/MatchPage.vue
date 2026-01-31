@@ -1,7 +1,5 @@
 <template>
   <div class="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100">
-    <!-- Barre de nav -->
-    <NavBar v-if="authStore.user?.is_admin === false" />
 
 
     <div class="p-6">
@@ -68,6 +66,8 @@
               <option value="">Tous</option>
               <option value="A_VENIR">À venir</option>
               <option value="ANNULE">Annulé</option>
+              <option value="TERMINE">Terminé</option>
+
             </select>
           </div>
         </div>
@@ -149,11 +149,18 @@
                 <span 
                   :class="{
                     'bg-blue-100 text-blue-800': match.status === 'A_VENIR',
-                    'bg-red-100 text-red-800': match.status === 'ANNULE'
+                    'bg-red-100 text-red-800': match.status === 'ANNULE',
+                    'bg-green-100 text-green-800': match.status === 'TERMINE'
                   }"
                   class="inline-block px-3 py-1 rounded-full text-sm font-medium"
                 >
-                  {{ match.status === 'A_VENIR' ? 'À venir' : 'Annulé' }}
+                  {{
+                    match.status === 'A_VENIR'
+                      ? 'À venir'
+                      : match.status === 'ANNULE'
+                        ? 'Annulé'
+                        : 'Terminé'
+                  }}
                 </span>
               </td>
 

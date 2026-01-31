@@ -96,8 +96,8 @@ class Match(Base):
     event_id = Column(Integer, ForeignKey("events.id"), nullable=True)
     court_number = Column(Integer, nullable=False)
     status = Column(String, default=MatchStatus.A_VENIR, nullable=False)
-    score_team1 = Column(Integer, nullable=True)
-    score_team2 = Column(Integer, nullable=True)
+    score_team1 = Column(String, nullable=True)
+    score_team2 = Column(String, nullable=True)
 
     team1 = relationship("Team", back_populates="matches_as_team1", foreign_keys=[team1_id])
     team2 = relationship("Team", back_populates="matches_as_team2", foreign_keys=[team2_id])
