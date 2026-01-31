@@ -102,6 +102,21 @@ def read_upcoming_matches(
         traceback.print_exc()
         raise HTTPException(status_code=500, detail=str(e))
 
+@router.get("/{match_id}", response_model=MatchDetailResponse)
+def read_match(
+    match_id: int,
+    db: Session = Depends(get_db),
+    current_user: User = Depends(get_current_user)
+):
+    """
+    Récupère un match par son ID.
+    """
+    match = get_match_by_id(db, match_id)
+    if not match:
+        raise HTTPException(status_code=404, detail="Match introuvable")
+
+    return build_match_response(match)
+
 
 @router.post("/", response_model=MatchDetailResponse)
 def create_new_match(

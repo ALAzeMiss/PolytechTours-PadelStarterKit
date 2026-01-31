@@ -83,6 +83,9 @@ def login(credentials: LoginRequest, db: Session = Depends(get_db)):
     # 3. Vérification unifiée (Existe + Mot de passe)
     # On utilise une variable pour savoir si c'est valide ou non
     is_valid_user = False
+    print("user is : ", User)
+    print("password verified : ", verify_password(credentials.password, user.password_hash))
+
     if user and verify_password(credentials.password, user.password_hash):
         is_valid_user = True
  
@@ -114,7 +117,8 @@ def login(credentials: LoginRequest, db: Session = Depends(get_db)):
         data={
             "sub": str(user.id),
             "email": user.email,
-            "is_admin": user.is_admin
+            "is_admin": user.is_admin,
+            "must_change_password": user.must_change_password
         }
     )
    

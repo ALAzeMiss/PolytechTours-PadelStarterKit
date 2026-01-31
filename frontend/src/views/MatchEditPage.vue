@@ -89,36 +89,47 @@
 
           <!-- Scores (si match terminé) -->
           <div v-if="formData.status === 'TERMINE'" class="mb-4 p-4 bg-gray-50 rounded-lg">
-            <h3 class="font-medium text-gray-700 mb-3">Scores</h3>
-            
+            <h3 class="font-medium text-gray-700 mb-3">Scores (sets)</h3>
+
+            <p class="text-xs text-gray-500 mb-3">
+              Format attendu : <strong>X-Y, X-Y</strong> ou <strong>X-Y, X-Y, X-Y</strong><br />
+              Exemple : <strong>6-4, 3-6, 7-5</strong><br />
+              L’équipe 2 doit être l’inverse : <strong>4-6, 6-3, 5-7</strong>
+            </p>
+
             <div class="grid grid-cols-2 gap-4">
               <div>
                 <label for="score_team1" class="block text-sm font-medium text-gray-700 mb-2">
-                  Score Équipe 1
+                  Score Équipe 1 *
                 </label>
                 <input
-                  type="number"
+                  type="text"
                   id="score_team1"
-                  v-model.number="formData.score_team1"
-                  min="0"
+                  v-model.trim="formData.score_team1"
+                  placeholder='Ex: 7-5, 6-4'
                   class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
                 />
               </div>
-              
+
               <div>
                 <label for="score_team2" class="block text-sm font-medium text-gray-700 mb-2">
-                  Score Équipe 2
+                  Score Équipe 2 *
                 </label>
                 <input
-                  type="number"
+                  type="text"
                   id="score_team2"
-                  v-model.number="formData.score_team2"
-                  min="0"
+                  v-model.trim="formData.score_team2"
+                  placeholder='Ex: 5-7, 4-6'
                   class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
                 />
               </div>
             </div>
+
+            <p v-if="scoreError" class="mt-3 text-sm text-red-600 font-medium">
+              {{ scoreError }}
+            </p>
           </div>
+
 
           <!-- Informationséquipes (lecture seule) -->
           <div class="mb-4 p-4 bg-blue-50 rounded-lg">
@@ -153,7 +164,7 @@
 </template>
 
 <script setup>
-import { ref, onMounted, computed } from 'vue'
+import { ref, onMounted, computed, watch } from 'vue'
 import { useRouter, useRoute } from 'vue-router'
 import { matchAPI } from '@/services/api'
 
@@ -167,23 +178,89 @@ const formData = ref({
   match_time: '',
   court_number: 1,
   status: 'A_VENIR',
-  score_team1: null,
-  score_team2: null
+  score_team1: '',
+  score_team2: '',
 })
 
 const currentMatch = ref(null)
 const loadingMatch = ref(false)
 const loading = ref(false)
 const error = ref('')
+const scoreError = ref('')
 
 const minDate = computed(() => {
   const today = new Date()
   return today.toISOString().split('T')[0]
 })
 
+// ---------- Validation front (basique + inverse exact) ----------
+const parseSets = (scoreStr) => {
+  if (!scoreStr) return []
+  return scoreStr
+    .split(',')
+    .map(s => s.trim())
+    .filter(Boolean)
+    .map(setStr => {
+      const m = setStr.match(/^(\d+)\s*-\s*(\d+)$/)
+      if (!m) return null
+      return [Number(m[1]), Number(m[2])]
+    })
+}
+
+const validateInverseScores = () => {
+  scoreError.value = ''
+
+  if (formData.value.status !== 'TERMINE') return true
+
+  const s1raw = formData.value.score_team1?.trim()
+  const s2raw = formData.value.score_team2?.trim()
+
+  if (!s1raw || !s2raw) {
+    scoreError.value = 'Les deux scores sont obligatoires lorsque le match est terminé.'
+    return false
+  }
+
+  const s1 = parseSets(s1raw)
+  const s2 = parseSets(s2raw)
+
+  if (s1.length < 2 || s1.length > 3 || s2.length < 2 || s2.length > 3) {
+    scoreError.value = 'Un match doit contenir 2 ou 3 sets (ex: "6-4, 3-6, 7-5").'
+    return false
+  }
+
+  if (s1.includes(null) || s2.includes(null)) {
+    scoreError.value = 'Format invalide. Utilisez "X-Y, X-Y" (ex: "6-4, 7-5").'
+    return false
+  }
+
+  if (s1.length !== s2.length) {
+    scoreError.value = 'Les deux scores doivent contenir le même nombre de sets.'
+    return false
+  }
+
+  for (let i = 0; i < s1.length; i++) {
+    const [a1, b1] = s1[i]
+    const [a2, b2] = s2[i]
+    if (a2 !== b1 || b2 !== a1) {
+      scoreError.value = `Incohérence au set ${i + 1} : Équipe 2 doit avoir ${b1}-${a1}.`
+      return false
+    }
+  }
+
+  return true
+}
+
+// Revalider en live
+watch(
+  () => [formData.value.status, formData.value.score_team1, formData.value.score_team2],
+  () => { validateInverseScores() }
+)
+
+
 const fetchMatch = async () => {
   loadingMatch.value = true
   error.value = ''
+  scoreError.value = ''
   
   try {
     const response = await matchAPI.getMatch(matchId)
@@ -195,8 +272,8 @@ const fetchMatch = async () => {
       match_time: response.data.match_time.substring(0, 5), // Format HH:MM
       court_number: response.data.court_number,
       status: response.data.status,
-      score_team1: response.data.score_team1,
-      score_team2: response.data.score_team2
+      score_team1: response.data.score_team1 ?? '',
+      score_team2: response.data.score_team2 ?? ''
     }
   } catch (err) {
     error.value = err.response?.data?.detail || 'Erreur lors du chargement du match'
@@ -208,6 +285,10 @@ const fetchMatch = async () => {
 
 const handleSubmit = async () => {
   error.value = ''
+  scoreError.value = ''
+
+  if (!validateInverseScores()) return
+  
   loading.value = true
   
   try {

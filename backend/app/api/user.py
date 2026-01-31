@@ -47,7 +47,7 @@ def createUser(user_data: CreateUserRequest, db: Session = Depends(get_db),curre
         email=user_data.email,
         password_hash=get_password_hash(temporary_password),
         is_admin=user_data.is_admin,
-        is_active=False,
+        is_active=True,
         must_change_password=True
     )
     db.add(new_user)
