@@ -13,9 +13,51 @@ from app.schemas.match import MatchCreate, MatchUpdate, MatchDetailResponse
 from app.schemas.team import TeamInfo
 from app.schemas.player import PlayerInfo
 from app.api.deps import get_current_user, get_current_admin
-from app.models.models import User
+from app.models.models import User, Match
 
 router = APIRouter(prefix="/matches", tags=["matches"])
+
+def build_match_response(match: Match) -> MatchDetailResponse:
+    """Construit une réponse MatchDetailResponse à partir d'un objet Match."""
+    try:
+        # Vérifier que toutes les équipes existent
+        if not match.team1 or not match.team2:
+            raise ValueError("Match incomplet: équipes manquantes")
+        
+        # Fonction helper pour obtenir les infos du joueur (avec fallback si manquant)
+        def get_player_info(player):
+            if not player:
+                return PlayerInfo(id=0, first_name="Joueur", last_name="Manquant")
+            return PlayerInfo(
+                id=player.id,
+                first_name=player.first_name,
+                last_name=player.last_name
+            )
+        
+        # Fonction helper pour obtenir les infos de l'équipe
+        def get_team_info(team):
+            return TeamInfo(
+                id=team.id,
+                company=team.company,
+                player1=get_player_info(team.player1),
+                player2=get_player_info(team.player2)
+            )
+        
+        return MatchDetailResponse(
+            id=match.id,
+            match_date=match.match_date,
+            match_time=match.match_time,
+            court_number=match.court_number,
+            status=match.status,
+            score_team1=match.score_team1,
+            score_team2=match.score_team2,
+            team1=get_team_info(match.team1),
+            team2=get_team_info(match.team2),
+            event_id=match.event_id
+        )
+    except Exception as e:
+        print(f"ERROR building match response for match {match.id}: {str(e)}")
+        raise
 
 @router.get("/", response_model=List[MatchDetailResponse])
 def read_upcoming_matches(
@@ -28,61 +70,37 @@ def read_upcoming_matches(
 ):
     """
     Récupère la liste des matchs à venir dans les 30 prochains jours.
-    - Pour les joueurs : affiche uniquement leurs matchs par défaut (sauf si show_all=true)
-    - Pour les admins : affiche tous les matchs avec possibilité de filtrer
     """
-    matches = get_upcoming_matches(
-        db=db,
-        user=current_user,
-        show_all=show_all,
-        company_filter=company,
-        pool_filter=pool_id,
-        status_filter=status
-    )
-    
-    # Construire la réponse détaillée
-    result = []
-    for match in matches:
-        result.append(MatchDetailResponse(
-            id=match.id,
-            match_date=match.match_date,
-            match_time=match.match_time,
-            court_number=match.court_number,
-            status=match.status,
-            score_team1=match.score_team1,
-            score_team2=match.score_team2,
-            team1=TeamInfo(
-                id=match.team1.id,
-                company=match.team1.company,
-                player1=PlayerInfo(
-                    id=match.team1.player1.id,
-                    first_name=match.team1.player1.first_name,
-                    last_name=match.team1.player1.last_name
-                ),
-                player2=PlayerInfo(
-                    id=match.team1.player2.id,
-                    first_name=match.team1.player2.first_name,
-                    last_name=match.team1.player2.last_name
-                )
-            ),
-            team2=TeamInfo(
-                id=match.team2.id,
-                company=match.team2.company,
-                player1=PlayerInfo(
-                    id=match.team2.player1.id,
-                    first_name=match.team2.player1.first_name,
-                    last_name=match.team2.player1.last_name
-                ),
-                player2=PlayerInfo(
-                    id=match.team2.player2.id,
-                    first_name=match.team2.player2.first_name,
-                    last_name=match.team2.player2.last_name
-                )
-            ),
-            event_id=match.event_id
-        ))
-    
-    return result
+    try:
+        print(f"[DEBUG] Requête matchs - user: {current_user.email}, admin: {current_user.is_admin}, show_all: {show_all}")
+        
+        matches = get_upcoming_matches(
+            db=db,
+            user=current_user,
+            show_all=show_all,
+            company_filter=company,
+            pool_filter=pool_id,
+            status_filter=status
+        )
+        
+        print(f"[DEBUG] {len(matches)} matchs trouvés en base")
+        
+        result = []
+        for i, match in enumerate(matches):
+            try:
+                response = build_match_response(match)
+                result.append(response)
+            except Exception as e:
+                print(f"[ERROR] Erreur pour match {match.id}: {str(e)}")
+                raise
+        
+        print(f"[DEBUG] Retour de {len(result)} matchs au frontend")
+        return result
+    except Exception as e:
+        print(f"[ERROR] Exception dans read_upcoming_matches: {str(e)}")
+        import traceback
+        traceback.print_exc()
+        raise HTTPException(status_code=500, detail=str(e))
 
 
 @router.post("/", response_model=MatchDetailResponse)
@@ -100,44 +118,7 @@ def create_new_match(
     # Recharger le match avec toutes les relations
     match = get_match_by_id(db, match.id)
     
-    return MatchDetailResponse(
-        id=match.id,
-        match_date=match.match_date,
-        match_time=match.match_time,
-        court_number=match.court_number,
-        status=match.status,
-        score_team1=match.score_team1,
-        score_team2=match.score_team2,
-        team1=TeamInfo(
-            id=match.team1.id,
-            company=match.team1.company,
-            player1=PlayerInfo(
-                id=match.team1.player1.id,
-                first_name=match.team1.player1.first_name,
-                last_name=match.team1.player1.last_name
-            ),
-            player2=PlayerInfo(
-                id=match.team1.player2.id,
-                first_name=match.team1.player2.first_name,
-                last_name=match.team1.player2.last_name
-            )
-        ),
-        team2=TeamInfo(
-            id=match.team2.id,
-            company=match.team2.company,
-            player1=PlayerInfo(
-                id=match.team2.player1.id,
-                first_name=match.team2.player1.first_name,
-                last_name=match.team2.player1.last_name
-            ),
-            player2=PlayerInfo(
-                id=match.team2.player2.id,
-                first_name=match.team2.player2.first_name,
-                last_name=match.team2.player2.last_name
-            )
-        ),
-        event_id=match.event_id
-    )
+    return build_match_response(match)
 
 
 @router.patch("/{match_id}", response_model=MatchDetailResponse)
@@ -156,44 +137,7 @@ def update_existing_match(
     # Recharger avec toutes les relations
     match = get_match_by_id(db, match.id)
     
-    return MatchDetailResponse(
-        id=match.id,
-        match_date=match.match_date,
-        match_time=match.match_time,
-        court_number=match.court_number,
-        status=match.status,
-        score_team1=match.score_team1,
-        score_team2=match.score_team2,
-        team1=TeamInfo(
-            id=match.team1.id,
-            company=match.team1.company,
-            player1=PlayerInfo(
-                id=match.team1.player1.id,
-                first_name=match.team1.player1.first_name,
-                last_name=match.team1.player1.last_name
-            ),
-            player2=PlayerInfo(
-                id=match.team1.player2.id,
-                first_name=match.team1.player2.first_name,
-                last_name=match.team1.player2.last_name
-            )
-        ),
-        team2=TeamInfo(
-            id=match.team2.id,
-            company=match.team2.company,
-            player1=PlayerInfo(
-                id=match.team2.player1.id,
-                first_name=match.team2.player1.first_name,
-                last_name=match.team2.player1.last_name
-            ),
-            player2=PlayerInfo(
-                id=match.team2.player2.id,
-                first_name=match.team2.player2.first_name,
-                last_name=match.team2.player2.last_name
-            )
-        ),
-        event_id=match.event_id
-    )
+    return build_match_response(match)
 
 
 @router.delete("/{match_id}")

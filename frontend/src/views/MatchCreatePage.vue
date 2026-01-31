@@ -58,38 +58,54 @@
 
           <!-- Équipe 1 -->
           <div class="mb-4">
-            <label for="team1_id" class="block text-sm font-medium text-gray-700 mb-2">
+            <label for="team1_search" class="block text-sm font-medium text-gray-700 mb-2">
               Équipe 1 *
             </label>
-            <select
-              id="team1_id"
-              v-model.number="formData.team1_id"
-              required
+            <input
+              id="team1_search"
+              v-model="search1"
+              type="text"
+              placeholder="Rechercher une équipe"
+              @focus="showDropdown1 = true"
+              @blur="hideDropdown1"
               class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
-            >
-              <option value="">Sélectionnez une équipe</option>
-              <option v-for="team in teams" :key="team.id" :value="team.id">
-                {{ team.company }} - {{ team.player1.first_name }} {{ team.player1.last_name }} & {{ team.player2.first_name }} {{ team.player2.last_name }}
-              </option>
-            </select>
+            />
+            <div v-if="showDropdown1 && filteredTeams1.length" class="border border-gray-300 rounded-lg mt-1 max-h-40 overflow-y-auto bg-white">
+              <div
+                v-for="team in filteredTeams1"
+                :key="team.id"
+                @mousedown="selectTeam1(team)"
+                class="p-2 hover:bg-gray-100 cursor-pointer"
+              >
+                {{ team.company }} ({{ team.player1_name }} / {{ team.player2_name }})
+              </div>
+            </div>
           </div>
 
           <!-- Équipe 2 -->
           <div class="mb-4">
-            <label for="team2_id" class="block text-sm font-medium text-gray-700 mb-2">
+            <label for="team2_search" class="block text-sm font-medium text-gray-700 mb-2">
               Équipe 2 *
             </label>
-            <select
-              id="team2_id"
-              v-model.number="formData.team2_id"
-              required
+            <input
+              id="team2_search"
+              v-model="search2"
+              type="text"
+              placeholder="Rechercher une équipe"
+              @focus="showDropdown2 = true"
+              @blur="hideDropdown2"
               class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
-            >
-              <option value="">Sélectionnez une équipe</option>
-              <option v-for="team in teams" :key="team.id" :value="team.id" :disabled="team.id === formData.team1_id">
-                {{ team.company }} - {{ team.player1.first_name }} {{ team.player1.last_name }} & {{ team.player2.first_name }} {{ team.player2.last_name }}
-              </option>
-            </select>
+            />
+            <div v-if="showDropdown2 && filteredTeams2.length" class="border border-gray-300 rounded-lg mt-1 max-h-40 overflow-y-auto bg-white">
+              <div
+                v-for="team in filteredTeams2"
+                :key="team.id"
+                @mousedown="selectTeam2(team)"
+                class="p-2 hover:bg-gray-100 cursor-pointer"
+              >
+                {{ team.company }} ({{ team.player1_name }} / {{ team.player2_name }})
+              </div>
+            </div>
           </div>
 
           <!-- Boutons -->
@@ -118,8 +134,7 @@
 <script setup>
 import { ref, onMounted, computed } from 'vue'
 import { useRouter } from 'vue-router'
-import { matchAPI } from '@/services/api'
-import api from '@/services/api'
+import { matchAPI, teamAPI, playerAPI } from '@/services/api'
 
 const router = useRouter()
 
@@ -133,6 +148,10 @@ const formData = ref({
 })
 
 const teams = ref([])
+const search1 = ref('')
+const search2 = ref('')
+const showDropdown1 = ref(false)
+const showDropdown2 = ref(false)
 const loading = ref(false)
 const error = ref('')
 
@@ -141,14 +160,65 @@ const minDate = computed(() => {
   return today.toISOString().split('T')[0]
 })
 
-const fetchTeams = async () => {
+const filteredTeams1 = computed(() => {
+  if (!search1.value) return teams.value
+  return teams.value.filter(team =>
+    `${team.company} ${team.player1_name} ${team.player2_name}`.toLowerCase().includes(search1.value.toLowerCase())
+  )
+})
+
+const filteredTeams2 = computed(() => {
+  if (!search2.value) return teams.value
+  return teams.value.filter(team =>
+    `${team.company} ${team.player1_name} ${team.player2_name}`.toLowerCase().includes(search2.value.toLowerCase())
+  )
+})
+
+const fetchTeamsAndPlayers = async () => {
   try {
-    const response = await api.get('/teams')
-    teams.value = response.data
+    const teamsResponse = await teamAPI.getTeams()
+    const playersResponse = await playerAPI.getPlayers()
+    
+    const players = playersResponse.data
+    
+    // Enrichir les équipes avec les noms des joueurs
+    teams.value = teamsResponse.data.map(team => ({
+      ...team,
+      player1_name: players.find(p => p.id === team.player1_id)
+        ? `${players.find(p => p.id === team.player1_id).first_name} ${players.find(p => p.id === team.player1_id).last_name}`
+        : 'Inconnu',
+      player2_name: players.find(p => p.id === team.player2_id)
+        ? `${players.find(p => p.id === team.player2_id).first_name} ${players.find(p => p.id === team.player2_id).last_name}`
+        : 'Inconnu'
+    }))
   } catch (err) {
     error.value = 'Erreur lors du chargement des équipes'
     console.error('Erreur:', err)
   }
+}
+
+function selectTeam1(team) {
+  formData.value.team1_id = team.id
+  search1.value = `${team.company} (${team.player1_name} / ${team.player2_name})`
+  showDropdown1.value = false
+}
+
+function selectTeam2(team) {
+  formData.value.team2_id = team.id
+  search2.value = `${team.company} (${team.player1_name} / ${team.player2_name})`
+  showDropdown2.value = false
+}
+
+function hideDropdown1() {
+  setTimeout(() => {
+    showDropdown1.value = false
+  }, 150)
+}
+
+function hideDropdown2() {
+  setTimeout(() => {
+    showDropdown2.value = false
+  }, 150)
 }
 
 const handleSubmit = async () => {
@@ -164,6 +234,8 @@ const handleSubmit = async () => {
   
   try {
     await matchAPI.createMatch(formData.value)
+    // Ajouter un délai pour s'assurer que le serveur a créé le match
+    await new Promise(resolve => setTimeout(resolve, 500))
     router.push('/matches')
   } catch (err) {
     error.value = err.response?.data?.detail || 'Erreur lors de la création du match'
@@ -178,6 +250,6 @@ const handleCancel = () => {
 }
 
 onMounted(() => {
-  fetchTeams()
+  fetchTeamsAndPlayers()
 })
 </script>

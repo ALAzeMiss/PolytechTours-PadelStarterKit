@@ -3,7 +3,7 @@
 # ============================================
 
 from pydantic import BaseModel, Field, field_validator
-from typing import Optional
+from typing import Optional, Union
 from enum import Enum
 from datetime import date, time, datetime
 from app.schemas.team import TeamInfo
@@ -15,11 +15,21 @@ class MatchStatus(str, Enum):
 
 class MatchBase(BaseModel):
     match_date: date = Field(..., description="Date du match (YYYY-MM-DD)")
-    match_time: time = Field(..., description="Heure du match (HH:MM)")
+    match_time: Union[time, str] = Field(..., description="Heure du match (HH:MM)")
     court_number: int = Field(..., ge=1, le=10, description="Numéro de piste (1-10)")
     status: MatchStatus = MatchStatus.A_VENIR
     score_team1: Optional[int] = Field(None, ge=0)
     score_team2: Optional[int] = Field(None, ge=0)
+
+    @field_validator('match_time', mode='before')
+    @classmethod
+    def parse_time(cls, v):
+        if isinstance(v, str):
+            try:
+                return datetime.strptime(v, '%H:%M').time()
+            except ValueError:
+                raise ValueError('Format d\'heure invalide, utilisez HH:MM')
+        return v
 
     @field_validator('match_date')
     @classmethod

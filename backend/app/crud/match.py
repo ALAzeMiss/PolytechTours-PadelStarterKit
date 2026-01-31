@@ -53,15 +53,8 @@ def get_upcoming_matches(
     today = datetime.now().date()
     end_date = today + timedelta(days=days)
     
-    # Requête de base avec jointures pour récupérer toutes les infos
-    query = db.query(Match).options(
-        joinedload(Match.team1).joinedload(Team.player1),
-        joinedload(Match.team1).joinedload(Team.player2),
-        joinedload(Match.team2).joinedload(Team.player1),
-        joinedload(Match.team2).joinedload(Team.player2),
-        joinedload(Match.team1).joinedload(Team.pools),
-        joinedload(Match.team2).joinedload(Team.pools)
-    ).filter(
+    # Requête de base simple (sans joinedload d'abord)
+    query = db.query(Match).filter(
         Match.match_date >= today,
         Match.match_date <= end_date
     )
@@ -82,21 +75,41 @@ def get_upcoming_matches(
             team_ids = [team.id for team in player_teams]
             
             # Filtrer les matchs où le joueur participe
-            query = query.filter(
-                (Match.team1_id.in_(team_ids)) | (Match.team2_id.in_(team_ids))
-            )
+            if team_ids:
+                query = query.filter(
+                    (Match.team1_id.in_(team_ids)) | (Match.team2_id.in_(team_ids))
+                )
+            else:
+                # Si le joueur n'a pas d'équipes, retourner une liste vide
+                return []
     
-    # Filtres admin
+    # Filtres admin - utiliser une jointure mais pas avec joinedload
     if company_filter:
-        query = query.join(Team, (Match.team1_id == Team.id) | (Match.team2_id == Team.id))
-        query = query.filter(Team.company == company_filter)
+        company_team_ids = db.query(Team.id).filter(Team.company == company_filter).subquery()
+        query = query.filter(
+            (Match.team1_id.in_(company_team_ids)) |
+            (Match.team2_id.in_(company_team_ids))
+        )
     
     if pool_filter:
-        query = query.join(Team, (Match.team1_id == Team.id) | (Match.team2_id == Team.id))
-        query = query.filter(Team.pool_id == pool_filter)
+        pool_team_ids = db.query(Team.id).filter(Team.pool_id == pool_filter).subquery()
+        query = query.filter(
+            (Match.team1_id.in_(pool_team_ids)) |
+            (Match.team2_id.in_(pool_team_ids))
+        )
     
     # Trier par date et heure
     matches = query.order_by(Match.match_date, Match.match_time).all()
+    
+    # Force le chargement des relations
+    for match in matches:
+        # Accéder aux attributs force le lazy loading
+        _ = match.team1
+        _ = match.team1.player1
+        _ = match.team1.player2
+        _ = match.team2
+        _ = match.team2.player1
+        _ = match.team2.player2
     
     return matches
 
