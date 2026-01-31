@@ -39,7 +39,7 @@
               <router-link :to="`/equip/edit/${team.id}`">✏️</router-link>
 
               <!-- Poubelle pour supprimer -->
-              <button @click="teamStore.deleteTeam(team.id)" class="text-red-600 hover:text-red-800 text-xl">
+              <button @click="confirmDelete(team.id, team.company)" class="text-red-600 hover:text-red-800 text-xl">
                 🗑️
               </button>
             </td>
@@ -83,6 +83,12 @@ onMounted(async () => {
 
 
 const handleEquip = () => router.push('/equip/create')
+
+const confirmDelete = (teamId, teamCompany) => {
+  if (confirm(`Êtes-vous sûr de vouloir supprimer l'équipe "${teamCompany}" ?`)) {
+    teamStore.deleteTeam(teamId)
+  }
+}
 </script>
 
 <style scoped></style>

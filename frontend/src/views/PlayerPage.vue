@@ -42,7 +42,7 @@
             <td class="py-2 px-4 border flex gap-6 justify-center">
               <!-- Crayon pour modifier -->
               <router-link :to="`/players/edit/${p.id}`">✏️</router-link>
-              <button @click="store.deletePlayer(p.id)">🗑️</button>
+              <button @click="confirmDelete(p.id, p.first_name, p.last_name)" class="text-red-600 hover:text-red-800">🗑️</button>
             </td>
           </tr>
         </tbody>
@@ -71,6 +71,12 @@ onMounted(() => {
 })
 
 const handlePlayer = () => router.push('/players/create')
+
+const confirmDelete = (playerId, firstName, lastName) => {
+  if (confirm(`Êtes-vous sûr de vouloir supprimer le joueur "${firstName} ${lastName}" ?`)) {
+    store.deletePlayer(playerId)
+  }
+}
 
 
 </script>

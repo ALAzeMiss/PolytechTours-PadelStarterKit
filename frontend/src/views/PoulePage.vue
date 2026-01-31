@@ -39,7 +39,7 @@
               <router-link :to="`/poule/edit/${pool.id}`">✏️</router-link>
 
               <!-- Poubelle pour supprimer -->
-              <button @click="poolStore.deletePool(pool.id)" class="text-red-600 hover:text-red-800 text-xl">
+              <button @click="confirmDelete(pool.id, pool.name)" class="text-red-600 hover:text-red-800 text-xl">
                 🗑️
               </button>
             </td>
@@ -88,4 +88,10 @@ const getTeamsForPool = (poolId) => {
 }
 
 const handlePoule = () => router.push('/poule/create')
+
+const confirmDelete = (poolId, poolName) => {
+  if (confirm(`Êtes-vous sûr de vouloir supprimer la poule "${poolName}" ?`)) {
+    poolStore.deletePool(poolId)
+  }
+}
 </script>
