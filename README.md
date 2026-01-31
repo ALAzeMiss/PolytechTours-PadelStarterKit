@@ -108,11 +108,9 @@ Consultez le cahier des charges complet pour les spécifications détaillées.
 ## 🎯 À développer
 
 Toutes les autres fonctionnalités selon le cahier des charges :
-- Gestion des joueurs, équipes, poules
-- Planning et événements
-- Matchs et résultats
-- Administration
-- Profil utilisateur
+- Planning et événements (pas tout à fait réglé)
+- Matchs et résultats (encore quelques bugs)
+- Profil utilisateur (partie front uniquement)
 
 ## 📞 Support
 
